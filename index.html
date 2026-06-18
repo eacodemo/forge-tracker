@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Forge</title>
+    <!-- Prevent white flash before React mounts -->
+    <style>
+      html, body, #root {
+        margin: 0; padding: 0; height: 100%;
+        background: #080809;   /* dark default */
+        color: #f0f0f5;
+      }
+      /* Switch to light if user had light theme saved */
+    </style>
+    <script>
+      // Read saved theme BEFORE render to avoid flash
+      try {
+        const raw = localStorage.getItem("forge_v131");
+        if (raw) {
+          const d = JSON.parse(raw);
+          const theme = d?.profile?.theme || "dark";
+          document.documentElement.style.background = theme === "light" ? "#f2f1f8" : "#080809";
+          document.body && (document.body.style.background = theme === "light" ? "#f2f1f8" : "#080809");
+        }
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

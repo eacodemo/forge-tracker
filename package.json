@@ -1,0 +1,62 @@
+{
+  "name": "forge",
+  "version": "1.3.1",
+  "description": "Forge — app de escritorio Linux open source",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:build": "vite build && electron-builder --linux",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "download-fonts": "node scripts/download-fonts.js"
+  },
+  "dependencies": {
+    "chart.js": "^4.5.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.2.16",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^9.0.0",
+    "electron": "^32.0.0",
+    "electron-builder": "^25.0.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^6.0.3",
+    "vite": "^5.4.0",
+    "vitest": "^4.1.8",
+    "wait-on": "^8.0.0"
+  },
+  "build": {
+    "appId": "com.eacodemo.forge",
+    "productName": "Forge",
+    "copyright": "Copyright © 2026 eacodemo",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "public/**/*",
+      "package.json"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "rpm"
+      ],
+      "category": "Utility",
+      "desktop": {
+        "Name": "Forge",
+        "Comment": "Tracker de hábitos diarios",
+        "Categories": "Utility;Office;"
+      }
+    }
+  }
+}
