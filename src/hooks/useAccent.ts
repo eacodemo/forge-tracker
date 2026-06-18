@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { ACCENT_PALETTES } from "./storage.js";
+import { ACCENT_PALETTES } from "../utils/storage.js";
 
 export function useAccent(accentId: string, theme: string): void {
   useEffect(() => {

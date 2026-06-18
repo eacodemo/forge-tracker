@@ -107,16 +107,12 @@ interface StatsViewProps {
   checks: Record<string, true>;
   monthStats: MonthStats;
   L: TranslationSet;
-  lang: string;
   theme: string;
-  setMonthIdx?: (fn: (m: number) => number) => void;
-  setYear?: (fn: (y: number) => number) => void;
 }
 
 export default function StatsView({
   monthIdx, year, monthName, daysInMonth,
-  habits, checks, monthStats, L, lang, theme,
-  setMonthIdx, setYear,
+  habits, checks, monthStats, L, theme,
 }: StatsViewProps) {
   const [period, setPeriod] = useState<"month"|"quarter"|"semester">("month");
   const prevMonth0    = monthIdx === 0 ? 11 : monthIdx - 1;

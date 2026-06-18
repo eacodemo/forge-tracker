@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { loadData, loadDataAsync, saveData, saveDataAsync, archiveOldChecks, makeKey, makeNoteKey } from "../utils/storage";
 import { LANGS, DAYS_IN_MONTH } from "../i18n/translations";
-import { useAccent } from "../utils/useAccent";
+import { useAccent } from "./useAccent";
 import { playCheck, playUncheck } from "../utils/sound";
 import { useGamificationWorker } from "./useGamificationWorker";
 import { useUndo } from "./useUndo";
@@ -36,8 +36,6 @@ export interface UseHabitDataReturn {
   profile: Data["profile"];
   lang: string;
   theme: string;
-  accent: string;
-  userName: string;
   L: TranslationSet;
   monthStats: MonthStats;
   gamStats: GamStats;
@@ -268,7 +266,7 @@ export function useHabitData(): UseHabitDataReturn {
   return {
     data, view, setView, year, setYear, monthIdx, setMonthIdx,
     todayDay, todayMonth, todayYear, isCurrentMonth, monthName, daysInMonth,
-    habits, checks, numeric, notes, profile, lang, theme, accent, userName, L,
+    habits, checks, numeric, notes, profile, lang, theme, L,
     monthStats, gamStats, xp, levelData, badges, xpPct,
     initials, levelNames, toast, onboarded,
     update, setData, toggleCheck, setNumeric, setNote, toggleTheme, showToast, undo,
