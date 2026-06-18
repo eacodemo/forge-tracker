@@ -192,11 +192,4 @@ export const LANGS: Record<string, TranslationSet> = {
   },
 };
 
-export function t(lang: string, path: string): string {
-  const keys = path.split(".");
-  let obj: any = LANGS[lang] || LANGS.es;
-  for (const k of keys) { obj = obj?.[k]; if (obj === undefined) break; }
-  return obj ?? path;
-}
-
 export const DAYS_IN_MONTH = (y: number, m: number): number => new Date(y, m + 1, 0).getDate();

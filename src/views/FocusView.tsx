@@ -1,5 +1,4 @@
-import { makeKey, isHabitScheduledForDay } from "../utils/storage";
-import { CATEGORIES, normalizeHabit } from "../utils/storage";
+import { makeKey, isHabitScheduledForDay, CATEGORIES, normalizeHabit } from "../utils/storage";
 import { pctColor } from "../utils/colors";
 import { DAYS_IN_MONTH } from "../i18n/translations";
 import type { Habit, MonthStats } from "../types";
@@ -15,10 +14,9 @@ interface FocusViewProps {
   monthStats: MonthStats;
   toggleCheck: (hi: number, day: number) => void;
   L: TranslationSet;
-  lang: string;
 }
 
-export default function FocusView({ year, monthIdx, todayDay, isCurrentMonth, habits, checks, monthStats, toggleCheck, L, lang }: FocusViewProps) {
+export default function FocusView({ year, monthIdx, todayDay, isCurrentMonth, habits, checks, monthStats, toggleCheck, L }: FocusViewProps) {
   const displayDay = isCurrentMonth ? todayDay : Math.min(todayDay, DAYS_IN_MONTH(year, monthIdx));
   const scheduled = habits.filter((h) => isHabitScheduledForDay(normalizeHabit(h).schedule, year, monthIdx, displayDay));
   const done  = scheduled.filter((h) => { const hi = habits.indexOf(h); return checks[makeKey(year,monthIdx,hi,displayDay)]; }).length;

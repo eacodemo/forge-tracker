@@ -1,5 +1,4 @@
-import { makeKey, isHabitScheduledForDay, normalizeHabit } from "../utils/storage";
-import { CATEGORIES } from "../utils/storage";
+import { makeKey, isHabitScheduledForDay, normalizeHabit, CATEGORIES } from "../utils/storage";
 import { pctColor } from "../utils/colors";
 import type { Habit, MonthStats, Profile } from "../types";
 import type { TranslationSet } from "../i18n/translations";
