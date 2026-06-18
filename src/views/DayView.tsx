@@ -14,9 +14,10 @@ interface DayViewProps {
   toggleCheck: (hi: number, day: number) => void;
   L: TranslationSet;
   profile: Profile;
+  xp: number;
 }
 
-export default function DayView({ year, monthIdx, todayDay, habits, checks, numeric, monthStats, toggleCheck, L, profile }: DayViewProps) {
+export default function DayView({ year, monthIdx, todayDay, habits, checks, numeric, monthStats, toggleCheck, L, profile, xp }: DayViewProps) {
   const now = new Date();
   const hour = now.getHours();
   const greeting = hour < 12 ? L.greeting.morning : hour < 19 ? L.greeting.afternoon : L.greeting.evening;
@@ -30,7 +31,6 @@ export default function DayView({ year, monthIdx, todayDay, habits, checks, nume
   const pct = total ? done / total : 0;
   const color = pctColor(pct);
 
-  const totalXP = monthStats.habitPct.reduce((s, p) => s + Math.round(p * 100), 0);
   const bestStreak = Math.max(...monthStats.streaks, 0);
   const daysComplete = monthStats.daysComplete;
   const monthName = L.months[monthIdx];
@@ -58,9 +58,9 @@ export default function DayView({ year, monthIdx, todayDay, habits, checks, nume
           <div style={{ fontSize: 10, color: "var(--fg4)" }}>{L.focus.consecutive}</div>
         </div>
         <div className="day-stat-card">
-          <div style={{ fontSize: 11, color: "var(--fg3)", marginBottom: 4 }}>⭐ {L.gamify.totalXP}</div>
-          <div style={{ fontFamily: "var(--fd)", fontSize: 22, fontWeight: 700, color: "var(--acc)" }}>{totalXP}</div>
-          <div style={{ fontSize: 10, color: "var(--fg4)" }}>{monthName}</div>
+          <div style={{ fontSize: 11, color: "var(--fg3)", marginBottom: 4 }}>⚔️ {L.gamify.totalXP}</div>
+          <div style={{ fontFamily: "var(--fd)", fontSize: 22, fontWeight: 700, color: "var(--gold)" }}>{xp.toLocaleString()}</div>
+          <div style={{ fontSize: 10, color: "var(--fg4)" }}>{L.gamify.totalXP}</div>
         </div>
       </div>
 

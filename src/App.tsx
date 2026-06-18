@@ -95,7 +95,7 @@ export default function App() {
             </div>
           )}
           <Suspense fallback={<div className="view-loading">···</div>}>
-            <ErrorBoundary name="DayView">{view==="day"&&<DayView year={year} monthIdx={monthIdx} todayDay={todayDay} habits={habits} checks={checks} numeric={numeric||{}} monthStats={monthStats} toggleCheck={toggleCheck} L={L} profile={profile}/>}</ErrorBoundary>
+            <ErrorBoundary name="DayView">{view==="day"&&<DayView year={year} monthIdx={monthIdx} todayDay={todayDay} habits={habits} checks={checks} numeric={numeric||{}} monthStats={monthStats} toggleCheck={toggleCheck} L={L} profile={profile} xp={xp}/>}</ErrorBoundary>
             <ErrorBoundary name="TrackerView">{view==="tracker"&&<TrackerView year={year} monthIdx={monthIdx} daysInMonth={daysInMonth} todayDay={todayDay} isCurrentMonth={isCurrentMonth} habits={habits} checks={checks} numeric={numeric||{}} notes={notes||{}} monthStats={monthStats} toggleCheck={toggleCheck} setNumeric={setNumeric} setNote={setNote} update={update} L={L}/>}</ErrorBoundary>
             <ErrorBoundary name="FocusView">{view==="focus"&&<FocusView year={year} monthIdx={monthIdx} todayDay={todayDay} isCurrentMonth={isCurrentMonth} habits={habits} checks={checks} monthStats={monthStats} toggleCheck={toggleCheck} L={L}/>}</ErrorBoundary>
             <ErrorBoundary name="StatsView">{view==="stats"&&<StatsView monthIdx={monthIdx} year={year} monthName={monthName} daysInMonth={daysInMonth} habits={habits} checks={checks} monthStats={monthStats} L={L} theme={theme}/>}</ErrorBoundary>

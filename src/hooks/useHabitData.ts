@@ -175,7 +175,7 @@ export function useHabitData(): UseHabitDataReturn {
     const wasChecked = !!checks[k];
     const next = {...checks};
     if (wasChecked) { delete next[k]; playUncheck(); }
-    else { next[k]=true; playCheck(); }
+    else { next[k]=true; playCheck(); showToast("+10 XP", "gold"); }
     update({checks:next});
     pushUndo(() => {
       const revert = {...(dataRef.current.checks || {})};
@@ -253,7 +253,7 @@ export function useHabitData(): UseHabitDataReturn {
     api.updateTrayTooltip(done, total, pct);
   }, [checks, habits, year, monthIdx, todayDay, isCurrentMonth]);
 
-  const gamResult = useGamificationWorker(checks, habits);
+  const gamResult = useGamificationWorker(checks, habits, data.archivedCheckCount || 0);
   const gamStats: GamStats = gamResult?.gamStats || { totalChecks:0, maxStreak:0, perfectDays:0, perfectWeeks:0, maxCombo:0, activeDaysMonth:0, categoriesUsed:0 };
   const xp = gamResult?.xp || 0;
   const levelData: Level = gamResult?.levelData || { level:1, name:"Iniciado", xpMin:0, xpMax:100 };

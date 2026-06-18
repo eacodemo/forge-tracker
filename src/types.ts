@@ -34,6 +34,7 @@ export interface Data {
   checks: Record<string, true>;
   numeric: Record<string, number>;
   notes: Record<string, string>;
+  archivedCheckCount?: number;
   _repaired?: true;
   _issues?: string[];
   exportedAt?: string;

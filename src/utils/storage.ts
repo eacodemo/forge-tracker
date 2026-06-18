@@ -327,6 +327,7 @@ export function archiveOldChecks(data: Data, keepMonths: number = 6): Data {
     const m = k.match(/^(\d{4}-\d{2})/);
     if (m && m[1] >= cutoffStr) next.notes[k] = (data.notes||{})[k];
   });
+  next.archivedCheckCount = (data.archivedCheckCount || 0) + Object.keys(archivedChecks).length;
   return next;
 }
 
