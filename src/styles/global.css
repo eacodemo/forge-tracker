@@ -519,7 +519,7 @@ body {
   background:var(--sf2); border:1px solid var(--bdr2); border-radius:var(--r-lg);
   padding:13px; margin-bottom:12px;
 }
-.habit-form-row { display:flex; gap:6; flexWrap:wrap; }
+.habit-form-row { display:flex; gap:6; flex-wrap:wrap; }
 .habit-chip {
   padding:3px 9px; border-radius:99px; border:1.5px solid var(--bdr);
   background:transparent; color:var(--fg3); cursor:pointer;
