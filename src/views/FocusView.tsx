@@ -46,6 +46,12 @@ export default function FocusView({ year, monthIdx, todayDay, isCurrentMonth, ha
           </div>
         )}
       </div>
+      {scheduled.length === 0 ? (
+        <div style={{ padding:32, textAlign:"center", color:"var(--fg3)" }}>
+          <div style={{ fontSize:36, marginBottom:10 }}>🎯</div>
+          <div style={{ fontSize:13, fontWeight:600, color:"var(--fg)", marginBottom:4 }}>{L.focus.empty}</div>
+        </div>
+      ) : (
       <div className="focus-grid">
         {habits.map((h,hi) => {
           const habit    = normalizeHabit(h);
@@ -72,6 +78,7 @@ export default function FocusView({ year, monthIdx, todayDay, isCurrentMonth, ha
           );
         })}
       </div>
+      )}
     </div>
   );
 }

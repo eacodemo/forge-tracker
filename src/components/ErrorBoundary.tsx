@@ -1,5 +1,6 @@
 import { Component, type ReactNode, type ErrorInfo } from "react";
 import Modal from "./Modal";
+import { LANGS } from "../i18n/translations";
 
 interface Props {
   children: ReactNode;
@@ -44,13 +45,18 @@ export default class ErrorBoundary extends Component<Props, State> {
   render(): ReactNode {
     if (!this.state.error) return this.props.children;
 
-    const isDark = document.querySelector(".app")?.classList.contains("dark") ?? true;
-    const bg     = isDark ? "#0f0f14" : "#f2f1f8";
-    const card   = isDark ? "#1a1a22" : "#ffffff";
-    const border = isDark ? "#2e2e44" : "#dddaf0";
-    const fg     = isDark ? "#f0f0f5" : "#12111e";
-    const fg3    = isDark ? "#60607a" : "#9896b2";
-    const acc    = "#e63946";
+    const root = document.querySelector(".app");
+    const cs = root ? getComputedStyle(root) : null;
+    const bg     = cs?.getPropertyValue("--bg")?.trim()     || "#0f0f14";
+    const card   = cs?.getPropertyValue("--sf")?.trim()     || "#1a1a22";
+    const border = cs?.getPropertyValue("--bdr")?.trim()    || "#2e2e44";
+    const fg     = cs?.getPropertyValue("--fg")?.trim()     || "#f0f0f5";
+    const fg3    = cs?.getPropertyValue("--fg3")?.trim()    || "#60607a";
+    const acc    = cs?.getPropertyValue("--acc")?.trim()    || "#e63946";
+
+    let lang = "es";
+    try { lang = JSON.parse(localStorage.getItem("forge_profile") || "{}").lang || "es"; } catch {}
+    const EB = (LANGS[lang] || LANGS.es).errorBoundary;
 
     return (<>
       <div style={{
@@ -69,22 +75,21 @@ export default class ErrorBoundary extends Component<Props, State> {
             fontFamily: "'Syne', 'Segoe UI', sans-serif",
             fontSize: 20, fontWeight: 700, color: fg, marginBottom: 8,
           }}>
-            Algo salió mal
+            {EB.title}
           </div>
 
           <p style={{ color: fg3, fontSize: 13, lineHeight: 1.6, marginBottom: 20 }}>
-            Forge encontró un error inesperado. Tus datos están seguros.
-            Puedes intentar recuperarte o reiniciar la vista.
+            {EB.message}
           </p>
 
           <details style={{
-            background: isDark ? "#111118" : "#f4f3fc",
+            background: cs?.getPropertyValue("--sf4")?.trim() || "#111118",
             border: `1px solid ${border}`,
             borderRadius: 8, padding: "8px 12px",
             marginBottom: 20, textAlign: "left",
           }}>
             <summary style={{ fontSize: 11, color: fg3, cursor: "pointer", fontFamily: "monospace" }}>
-              Detalle técnico
+              {EB.detail}
             </summary>
             <pre style={{
               fontSize: 10, color: acc, marginTop: 8,
@@ -106,7 +111,7 @@ export default class ErrorBoundary extends Component<Props, State> {
                 cursor: "pointer",
               }}
             >
-              🔄 Reintentar
+              🔄 {EB.retry}
             </button>
             <button
               onClick={() => window.location.reload()}
@@ -117,27 +122,27 @@ export default class ErrorBoundary extends Component<Props, State> {
                 fontSize: 13, fontWeight: 600, cursor: "pointer",
               }}
             >
-              ↺ Recargar app
+              ↺ {EB.reload}
             </button>
             <button
               onClick={this.handleNuke}
               style={{
                 padding: "9px 18px", borderRadius: 9, border: "none",
-                background: "transparent", color: isDark ? "#fb7185" : "#dc2626",
+                background: "transparent", color: "var(--red,#fb7185)",
                 fontFamily: "'DM Sans', sans-serif", fontSize: 13,
                 fontWeight: 600, cursor: "pointer",
               }}
             >
-              🗑 Limpiar datos
+              🗑 {EB.nuke}
             </button>
           </div>
         </div>
       </div>
 
       <Modal open={this.state.nukeModalOpen}
-        title="¿Borrar todos los datos?"
-        message="Esta acción no se puede deshacer. Se eliminarán todos tus hábitos, checks y configuración."
-        danger confirmLabel="Eliminar todo" cancelLabel="Cancelar"
+        title={EB.nukeTitle}
+        message={EB.nukeMessage}
+        danger confirmLabel={EB.confirmLabel} cancelLabel={EB.cancelLabel}
         onConfirm={this.handleNukeConfirm}
         onCancel={() => this.setState({ nukeModalOpen: false })} />
     </>);

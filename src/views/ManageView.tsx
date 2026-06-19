@@ -26,11 +26,12 @@ function HabitForm({ initial, onSave, onCancel, L, lang }:
   const catNames = L.catNames || {};
   function submit() {
     if (!name.trim()) return;
+    const safeGoal = (type === "numeric" && (isNaN(goal) || goal < 1)) ? 1 : goal;
     const schedule: HabitSchedule | undefined = schedType === "daily" ? undefined : {
       type: schedType as HabitSchedule["type"],
-      ...(schedType === "interval" ? { interval: schedInterval, startDay: schedStartDay } : {}),
+      ...(schedType === "interval" ? { interval: isNaN(schedInterval) ? 2 : schedInterval, startDay: schedStartDay } : {}),
     };
-    onSave({ name:name.trim(), cat, type, schedule, ...(type==="numeric"?{goal:Number(goal),unit}:{}) } as Habit);
+    onSave({ name:name.trim(), cat, type, schedule, ...(type==="numeric"?{goal:safeGoal,unit}:{}) } as Habit);
   }
   return (
     <div className="habit-form">
@@ -53,7 +54,10 @@ function HabitForm({ initial, onSave, onCancel, L, lang }:
         </div>
         {type==="numeric"&&(
           <div style={{ display:"flex", gap:8 }}>
-            <input className="manage-input" type="number" min={1} max={100} value={goal} onChange={e=>setGoal(Number(e.target.value))} style={{ maxWidth:76 }}/>
+            <input className="manage-input" type="number" min={1} max={100} value={goal}
+              onChange={e=>{ const v=e.target.value; if(v===""||v==="-"){setGoal(NaN);return;} const n=Number(v); if(!isNaN(n)&&n>=0)setGoal(n); }}
+              onBlur={()=>{ if(isNaN(goal)||goal<1) setGoal(1); }}
+              style={{ maxWidth:76 }}/>
             <input className="manage-input" value={unit} onChange={e=>setUnit(e.target.value)} placeholder="Unidad"/>
           </div>
         )}
@@ -71,7 +75,9 @@ function HabitForm({ initial, onSave, onCancel, L, lang }:
             <div style={{ display:"flex", gap:8, alignItems:"center" }}>
               <span style={{ fontSize:11, color:"var(--fg3)" }}>{L.manage.schedEvery || "Cada"}</span>
               <input className="manage-input" type="number" min={2} max={365} value={schedInterval}
-                onChange={e=>setSchedInterval(Number(e.target.value))} style={{ width:50 }}/>
+                onChange={e=>{ const v=e.target.value; if(v===""||v==="-"){setSchedInterval(NaN);return;} const n=Number(v); if(!isNaN(n)&&n>=2)setSchedInterval(n); }}
+                onBlur={()=>{ if(isNaN(schedInterval)||schedInterval<2) setSchedInterval(2); }}
+                style={{ width:50 }}/>
               <span style={{ fontSize:11, color:"var(--fg3)" }}>{L.manage.schedDays2 || "días"}</span>
               <span style={{ fontSize:11, color:"var(--fg4)", marginLeft:6 }}>{L.manage.schedStartDay || "Empieza día"}</span>
               <input className="manage-input" type="number" min={1} max={31} value={schedStartDay}
@@ -177,7 +183,7 @@ export default function ManageView({ habits, data, update, showToast, L, lang, p
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:11 }}>
           <h2 className="section-title" style={{ marginBottom:0 }}>{L.manage.title} ({habits.length})</h2>
           <div style={{ display:"flex", gap:7 }}>
-            <button className="btn btn-ghost" onClick={()=>setSettingsOpen(!settingsOpen)} style={{ fontSize:12 }}>⚙️ Config</button>
+            <button className="btn btn-ghost" onClick={()=>setSettingsOpen(!settingsOpen)} style={{ fontSize:12 }}>⚙️ {L.manage.config}</button>
             <button className="btn btn-primary" onClick={()=>{ setAdding(true); setEditIdx(null); }}>{L.manage.newHabit}</button>
           </div>
         </div>
@@ -308,7 +314,7 @@ export default function ManageView({ habits, data, update, showToast, L, lang, p
       </div>
 
       <Modal open={modalOpen} title={modalConfig.title} message={modalConfig.message}
-        danger={modalConfig.danger} confirmLabel="Eliminar" cancelLabel="Cancelar"
+        danger={modalConfig.danger} confirmLabel={L.manage.confirmLabel} cancelLabel={L.manage.cancel}
         onConfirm={modalConfig.onConfirm} onCancel={() => setModalOpen(false)} />
     </div>
   );

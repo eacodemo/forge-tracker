@@ -39,6 +39,7 @@ const baseProps = {
       toastNotif: "Notificación enviada",
       schedDaily: "Diario", schedWeekdays: "Días de semana", schedInterval: "Cada X días",
       schedDays: "Días", schedEvery: "Cada", schedDays2: "días", schedStartDay: "Empieza día",
+      config: "Config", confirmLabel: "Eliminar",
     },
     settings: { title: "Configuración", lang: "Idioma", theme: "Tema", accent: "Color de acento", notifTime: "Hora de recordatorio", profile: "Perfil", username: "Tu nombre", save: "Guardar cambios", saved: "¡Guardado!" },
   } as any,

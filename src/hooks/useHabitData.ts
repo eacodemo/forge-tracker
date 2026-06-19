@@ -108,7 +108,7 @@ export function useHabitData(): UseHabitDataReturn {
 
   useEffect(() => {
     if (data._repaired && data._issues && data._issues.length > 0) {
-      showToast(`⚠️ Datos reparados automáticamente (${data._issues.length} problema${data._issues.length > 1 ? "s" : ""})`, "danger");
+      showToast(`⚠️ ${L.gamify.repaired} (${data._issues.length})`, "danger");
     }
   }, []);
 

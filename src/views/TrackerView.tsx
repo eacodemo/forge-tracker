@@ -84,10 +84,10 @@ export default function TrackerView({
       <div style={{ padding:48, textAlign:"center", color:"var(--fg3)" }}>
         <div style={{ fontSize:52, marginBottom:14 }}>📅</div>
         <div style={{ fontFamily:"var(--fd)", fontSize:18, fontWeight:700, color:"var(--fg)", marginBottom:8 }}>
-          Sin hábitos todavía
+          {L.tracker.empty}
         </div>
         <p style={{ fontSize:13, lineHeight:1.7, maxWidth:300, margin:"0 auto 20px" }}>
-          Ve a <strong style={{ color:"var(--acc)" }}>⚙️ Hábitos</strong> para agregar tu primer hábito.
+          {L.tracker.emptyHint.replace("{settings}", "⚙️ " + L.nav.habits)}
         </p>
       </div>
     );

@@ -28,9 +28,11 @@ function DualLineChart({ currentPct, prevPct, daysInMonth, monthName, prevMonthN
     if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
 
     const isDark = theme === "dark";
-    const grid   = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)";
-    const lbl    = isDark ? "#60607a" : "#9896b2";
-    const acc    = getComputedStyle(document.documentElement).getPropertyValue("--acc").trim() || "#e63946";
+    const cs = getComputedStyle(document.documentElement);
+    const grid   = cs.getPropertyValue("--bdr").trim()  || (isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)");
+    const lbl    = cs.getPropertyValue("--fg3").trim() || (isDark ? "#60607a" : "#9896b2");
+    const acc    = cs.getPropertyValue("--acc").trim() || "#e63946";
+    const fg3    = cs.getPropertyValue("--fg3").trim() || (isDark ? "#555570" : "#c0bce0");
 
     chartRef.current = new Chart(canvasRef.current, {
       type: "line",
@@ -51,7 +53,7 @@ function DualLineChart({ currentPct, prevPct, daysInMonth, monthName, prevMonthN
           {
             label: prevMonthName,
             data: prevPct.slice(0, daysInMonth).map(v => Math.round(v * 100)),
-            borderColor: isDark ? "#555570" : "#c0bce0",
+            borderColor: fg3,
             backgroundColor: "transparent",
             borderWidth: 1.5,
             pointRadius: 2,
