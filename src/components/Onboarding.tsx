@@ -114,7 +114,7 @@ export default function Onboarding({ onComplete }: { onComplete: (d: Data) => vo
           <>
             <div className="onboard-title">{L.step3}</div>
 
-            <div style={{ fontSize:11, color:"var(--fg3)", fontFamily:"var(--fm)", textTransform:"uppercase", letterSpacing:1, marginBottom:7 }}>Tema</div>
+            <div style={{ fontSize:11, color:"var(--fg3)", fontFamily:"var(--fm)", textTransform:"uppercase", letterSpacing:1, marginBottom:7 }}>{L.theme}</div>
             <div style={{ display:"flex", gap:8, marginBottom:18 }}>
               {[{id:"dark",icon:"🌙",label:L.themeDark},{id:"light",icon:"☀️",label:L.themeLight}].map(t => (
                 <button key={t.id} onClick={() => setTheme(t.id)} style={{

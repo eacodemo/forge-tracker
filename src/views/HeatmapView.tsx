@@ -50,6 +50,12 @@ export default function HeatmapView({ checks, habits, year, L, setYear, setMonth
       <div className="card" style={{ marginBottom:14 }}>
         <div className="section-title" style={{ marginBottom:3 }}>{L.heatmap.annualActivity} {year}</div>
         <p style={{ color:"var(--fg3)",fontSize:12,marginBottom:14 }}>{L.heatmap.cellInfo}</p>
+        {habits.length === 0 ? (
+          <div style={{ padding:24, textAlign:"center", color:"var(--fg3)" }}>
+            <div style={{ fontSize:32, marginBottom:8 }}>📅</div>
+            <div style={{ fontSize:13 }}>{L.heatmap.empty}</div>
+          </div>
+        ) : (
         <div style={{ display:"flex",gap:8 }}>
           <div style={{ display:"flex",flexDirection:"column",gap:2,paddingTop:18,flexShrink:0 }}>
             {L.dow.map((d: string,i: number)=>(
@@ -84,6 +90,7 @@ export default function HeatmapView({ checks, habits, year, L, setYear, setMonth
             </div>
           </div>
         </div>
+        )}
         <div style={{ display:"flex",gap:5,alignItems:"center",marginTop:10,fontSize:11,color:"var(--fg3)" }}>
           <span>{L.heatmap.less}</span>
           {["heat-0","heat-1","heat-2","heat-3","heat-4"].map(c=><div key={c} className={`heatmap-cell ${c}`} style={{ flexShrink:0,cursor:"default" }}/>)}

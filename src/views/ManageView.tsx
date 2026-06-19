@@ -177,7 +177,7 @@ export default function ManageView({ habits, data, update, showToast, L, lang, p
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:11 }}>
           <h2 className="section-title" style={{ marginBottom:0 }}>{L.manage.title} ({habits.length})</h2>
           <div style={{ display:"flex", gap:7 }}>
-            <button className="btn btn-ghost" onClick={()=>setSettingsOpen(!settingsOpen)} style={{ fontSize:12 }}>⚙️ Config</button>
+            <button className="btn btn-ghost" onClick={()=>setSettingsOpen(!settingsOpen)} style={{ fontSize:12 }}>⚙️ {L.manage.config}</button>
             <button className="btn btn-primary" onClick={()=>{ setAdding(true); setEditIdx(null); }}>{L.manage.newHabit}</button>
           </div>
         </div>
@@ -308,7 +308,7 @@ export default function ManageView({ habits, data, update, showToast, L, lang, p
       </div>
 
       <Modal open={modalOpen} title={modalConfig.title} message={modalConfig.message}
-        danger={modalConfig.danger} confirmLabel="Eliminar" cancelLabel="Cancelar"
+        danger={modalConfig.danger} confirmLabel={L.manage.confirmLabel} cancelLabel={L.manage.cancel}
         onConfirm={modalConfig.onConfirm} onCancel={() => setModalOpen(false)} />
     </div>
   );
