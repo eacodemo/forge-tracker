@@ -39,7 +39,10 @@ export default function DayView({ year, monthIdx, todayDay, habits, checks, nume
           {greeting}{name ? `, ${name}` : ""} 👋
         </div>
         <div style={{ fontSize: 12, color: "var(--fg3)" }}>
-          {todayDay} de {monthName} {year}
+          {(L.dayView?.date || "{day} de {month} {year}")
+            .replace("{day}", String(todayDay))
+            .replace("{month}", monthName)
+            .replace("{year}", String(year))}
         </div>
       </div>
 

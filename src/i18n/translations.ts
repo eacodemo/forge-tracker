@@ -9,6 +9,7 @@ export interface TranslationSet {
   dowFull: string[];
   onboarding: Record<string, string>;
   tracker: Record<string, string>;
+  dayView: Record<string, string>;
   focus: Record<string, string>;
   stats: Record<string, string>;
   heatmap: Record<string, string>;
@@ -45,6 +46,7 @@ export const LANGS: Record<string, TranslationSet> = {
       next: "Siguiente", back: "Atrás", finish: "¡Empezar!", theme: "Tema",
     },
     tracker: { habit:"Hábito", completedDay:"Completadas / día", notesDay:"Notas del día", search:"Filtrar hábitos…", empty:"Sin hábitos todavía", emptyHint:"Ve a {settings} para agregar tu primer hábito." },
+    dayView: { date:"{day} de {month} {year}" },
     focus: { mode:"Modo Focus", perfectDay:"¡Día perfecto! Todos los hábitos completados. 🏆", consecutive:"días seguidos", onlyCurrentMonth:"El modo Focus solo funciona en el mes actual.", empty:"No hay hábitos programados para este día." },
     stats: {
       compliance:"Cumplimiento", perfectDays:"Días perfectos", activeDays:"Días activos",
@@ -103,6 +105,7 @@ export const LANGS: Record<string, TranslationSet> = {
       next: "Next", back: "Back", finish: "Let's go!", theme: "Theme",
     },
     tracker: { habit:"Habit", completedDay:"Completed / day", notesDay:"Day notes", search:"Filter habits…", empty:"No habits yet", emptyHint:"Go to {settings} to add your first habit." },
+    dayView: { date:"{day} {month} {year}" },
     focus: { mode:"Focus Mode", perfectDay:"Perfect day! All habits completed. 🏆", consecutive:"days in a row", onlyCurrentMonth:"Focus mode only works for the current month.", empty:"No habits scheduled for this day." },
     stats: {
       compliance:"Compliance", perfectDays:"Perfect days", activeDays:"Active days",
@@ -161,6 +164,7 @@ export const LANGS: Record<string, TranslationSet> = {
       next: "Próximo", back: "Voltar", finish: "Vamos lá!", theme: "Tema",
     },
     tracker: { habit:"Hábito", completedDay:"Concluídos / dia", notesDay:"Notas do dia", search:"Filtrar hábitos…", empty:"Nenhum hábito ainda", emptyHint:"Vá para {settings} para adicionar seu primeiro hábito." },
+    dayView: { date:"{day} de {month} {year}" },
     focus: { mode:"Modo Foco", perfectDay:"Dia perfeito! Todos os hábitos concluídos. 🏆", consecutive:"dias seguidos", onlyCurrentMonth:"O modo Foco só funciona no mês atual.", empty:"Nenhum hábito agendado para este dia." },
     stats: {
       compliance:"Cumprimento", perfectDays:"Dias perfeitos", activeDays:"Dias ativos",

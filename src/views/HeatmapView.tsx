@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { DAYS_IN_MONTH } from "../i18n/translations";
 import { makeKey } from "../utils/storage";
 import { pctColor } from "../utils/colors";
@@ -33,6 +33,63 @@ export default function HeatmapView({ checks, habits, year, L, setYear, setMonth
   const grid:(typeof cells[number]|null)[]=Array(COLS*ROWS).fill(null);
   cells.forEach((c,i)=>{ const s=startDow+i; if(s<COLS*ROWS) grid[s]=c; });
   function hc(p: number){ return p===0?"heat-0":p<0.3?"heat-1":p<0.6?"heat-2":p<0.9?"heat-3":"heat-4"; }
+
+  const [focused, setFocused] = useState<[number, number] | null>(null);
+
+  const findNextFocusable = useCallback((col: number, row: number, dir: "up"|"down"|"left"|"right"): [number, number] | null => {
+    let c = col, r = row;
+    for (let i = 0; i < Math.max(COLS, ROWS); i++) {
+      if (dir === "up") r--;
+      else if (dir === "down") r++;
+      else if (dir === "left") c--;
+      else if (dir === "right") c++;
+      if (c < 0 || c >= COLS || r < 0 || r >= ROWS) return null;
+      if (grid[c * ROWS + r]) return [c, r];
+    }
+    return null;
+  }, [grid]);
+
+  const handleGridKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (!focused) {
+      if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Enter"," "].includes(e.key)) {
+        e.preventDefault();
+        for (let c = 0; c < COLS; c++) {
+          for (let r = 0; r < ROWS; r++) {
+            if (grid[c * ROWS + r]) { setFocused([c, r]); return; }
+          }
+        }
+      }
+      return;
+    }
+    const [col, row] = focused;
+    const cell = grid[col * ROWS + row];
+
+    switch (e.key) {
+      case "ArrowUp": { e.preventDefault(); const n = findNextFocusable(col, row, "up"); if (n) setFocused(n); break; }
+      case "ArrowDown": { e.preventDefault(); const n = findNextFocusable(col, row, "down"); if (n) setFocused(n); break; }
+      case "ArrowLeft": { e.preventDefault(); const n = findNextFocusable(col, row, "left"); if (n) setFocused(n); break; }
+      case "ArrowRight": { e.preventDefault(); const n = findNextFocusable(col, row, "right"); if (n) setFocused(n); break; }
+      case "Enter": case " ": {
+        e.preventDefault();
+        if (cell) { setMonthIdx(cell.m); setView("tracker"); }
+        break;
+      }
+      case "Home": {
+        e.preventDefault();
+        for (let c = 0; c < COLS; c++) {
+          if (grid[c * ROWS + row]) { setFocused([c, row]); return; }
+        }
+        break;
+      }
+      case "End": {
+        e.preventDefault();
+        for (let c = COLS - 1; c >= 0; c--) {
+          if (grid[c * ROWS + row]) { setFocused([c, row]); return; }
+        }
+        break;
+      }
+    }
+  }, [focused, grid, findNextFocusable, setMonthIdx, setView]);
 
   const monthlyStats = useMemo(() => L.months.map((_: string, m: number)=>{
     const days=DAYS_IN_MONTH(year,m); let tot=0,pos=0;
@@ -72,18 +129,19 @@ export default function HeatmapView({ checks, habits, year, L, setYear, setMonth
                 return <div key={col} style={{ width:12,fontSize:9,color:"var(--fg3)",fontFamily:"var(--fm)",overflow:"hidden",whiteSpace:"nowrap" }}>{show?(L.monthsShort||L.months.map((m: string)=>m.slice(0,3)))[cell.m]:""}</div>;
               })}
             </div>
-            <div className="heatmap-wrap">
+            <div className="heatmap-wrap" role="grid" aria-label={`${L.heatmap.annualActivity} ${year}`} onKeyDown={handleGridKeyDown}>
               {Array.from({length:COLS}).map((_,col)=>(
-                <div key={col} className="heatmap-col">
+                <div key={col} className="heatmap-col" role="row">
                   {Array.from({length:ROWS}).map((_,row)=>{
                     const cell=grid[col*ROWS+row];
                     if(!cell) return <div key={row} style={{ width:12,height:12 }}/>;
+                    const isFocused = focused && focused[0]===col && focused[1]===row;
                     return <div key={row} className={`heatmap-cell ${hc(cell.pct)}`}
                       title={`${L.months[cell.m]} ${cell.d}: ${Math.round(cell.pct*100)}%`}
                       aria-label={`${L.months[cell.m]} ${cell.d}: ${Math.round(cell.pct*100)}%`}
-                      role="button" tabIndex={0}
-                      onClick={()=>{ setMonthIdx(cell.m); setView("tracker"); }}
-                      onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setMonthIdx(cell.m); setView("tracker"); } }}/>;
+                      role="gridcell" tabIndex={isFocused ? 0 : -1}
+                      ref={el => { if (isFocused && el) el.focus(); }}
+                      onClick={()=>{ setMonthIdx(cell.m); setView("tracker"); }}/>;
                   })}
                 </div>
               ))}
