@@ -38,8 +38,8 @@ const BADGE_DEFS = [
 
 const KEY_RE = /^(\d{4})-(\d{2})-(\d+)-(\d+)$/;
 
-export function computeStats(checks: Record<string, true>, habits: { length: number; [index: number]: { cat?: string } }): GamStats {
-  const totalChecks = Object.keys(checks).length;
+export function computeStats(checks: Record<string, true>, habits: { length: number; [index: number]: { cat?: string } }, archivedCheckCount: number = 0): GamStats {
+  const totalChecks = Object.keys(checks).length + archivedCheckCount;
 
   const cats = new Set<string>();
   for (let i=0; i<habits.length; i++) if (habits[i]?.cat) cats.add(habits[i]!.cat!);

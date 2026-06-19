@@ -3,6 +3,7 @@ import { computeStats, computeXP, getLevel, getEarnedBadges } from "./gamificati
 interface WorkerMessage {
   checks: Record<string, true>;
   habits: { length: number; [index: number]: { cat?: string } };
+  archivedCheckCount: number;
 }
 
 interface WorkerResponse {
@@ -14,8 +15,8 @@ interface WorkerResponse {
 }
 
 self.onmessage = (e: MessageEvent<WorkerMessage>) => {
-  const { checks, habits } = e.data;
-  const gamStats = computeStats(checks, habits);
+  const { checks, habits, archivedCheckCount } = e.data;
+  const gamStats = computeStats(checks, habits, archivedCheckCount);
   const xp       = computeXP(gamStats);
   const levelData= getLevel(xp);
   const badges   = getEarnedBadges(gamStats);

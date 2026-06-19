@@ -504,7 +504,7 @@ body {
   font-size:11px; color:var(--fg3); font-family:var(--fm);
   margin-bottom:5px; text-transform:uppercase; letter-spacing:1;
 }
-.settings-row { display:flex; gap:6; flex-wrap:wrap; }
+.settings-row { display:flex; gap:6px; flex-wrap:wrap; }
 .settings-option {
   padding:5px 12px; border-radius:99px; border:1.5px solid var(--bdr);
   background:transparent; color:var(--fg3); cursor:pointer;
@@ -519,7 +519,7 @@ body {
   background:var(--sf2); border:1px solid var(--bdr2); border-radius:var(--r-lg);
   padding:13px; margin-bottom:12px;
 }
-.habit-form-row { display:flex; gap:6; flex-wrap:wrap; }
+.habit-form-row { display:flex; gap:6px; flex-wrap:wrap; }
 .habit-chip {
   padding:3px 9px; border-radius:99px; border:1.5px solid var(--bdr);
   background:transparent; color:var(--fg3); cursor:pointer;

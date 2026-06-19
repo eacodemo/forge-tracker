@@ -135,7 +135,9 @@ export default function ManageView({ habits, data, update, showToast, L, lang, p
         const next=habits.filter((_,idx)=>idx!==i);
         const nc: Record<string, true> = {};
         Object.keys(data.checks).forEach(k=>{ const m=k.match(KEY_RE); if(!m)return; const hi=parseInt(m[3]); if(hi===i)return; const ni=hi>i?hi-1:hi; nc[`${m[1]}-${m[2]}-${ni}-${m[4]}`]=true; });
-        update({ habits:next, checks:nc } as Partial<Data>);
+        const nn: Record<string, number> = {};
+        Object.keys(data.numeric||{}).forEach(k=>{ const m=k.match(KEY_RE); if(!m)return; const hi=parseInt(m[3]); if(hi===i)return; const ni=hi>i?hi-1:hi; nn[`${m[1]}-${m[2]}-${ni}-${m[4]}`]=(data.numeric||{})[k]; });
+        update({ habits:next, checks:nc, numeric:nn } as Partial<Data>);
         showToast(L.manage.toastDeleted,"danger");
         setModalOpen(false);
       },
@@ -147,7 +149,9 @@ export default function ManageView({ habits, data, update, showToast, L, lang, p
     const next=[...habits]; [next[i],next[j]]=[next[j],next[i]];
     const nc: Record<string, true> = {};
     Object.keys(data.checks).forEach(k=>{ const m=k.match(KEY_RE); if(!m){nc[k]=true;return;} const hi=parseInt(m[3]); nc[`${m[1]}-${m[2]}-${hi===i?j:hi===j?i:hi}-${m[4]}`]=true; });
-    update({ habits:next, checks:nc } as Partial<Data>);
+    const nn: Record<string, number> = {};
+    Object.keys(data.numeric||{}).forEach(k=>{ const m=k.match(KEY_RE); if(!m){nn[k]=(data.numeric||{})[k];return;} const hi=parseInt(m[3]); nn[`${m[1]}-${m[2]}-${hi===i?j:hi===j?i:hi}-${m[4]}`]=(data.numeric||{})[k]; });
+    update({ habits:next, checks:nc, numeric:nn } as Partial<Data>);
   }
   function saveSettings() {
     const newProfile: Profile = {

@@ -1,11 +1,15 @@
 import type { Data, Habit } from "../types";
+import { newUserData } from "./storage";
 
 export function validateAndRepair(raw: unknown): Data {
   const issues: string[] = [];
 
   if (!raw || typeof raw !== "object") {
     issues.push("root object invalid — full reset");
-    return { _repaired: true, _issues: issues } as unknown as Data;
+    const d = newUserData();
+    d._repaired = true;
+    d._issues = issues;
+    return d;
   }
 
   const d = { ...raw } as Data;

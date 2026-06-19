@@ -14,24 +14,21 @@ interface DayViewProps {
   toggleCheck: (hi: number, day: number) => void;
   L: TranslationSet;
   profile: Profile;
+  xp: number;
 }
 
-export default function DayView({ year, monthIdx, todayDay, habits, checks, numeric, monthStats, toggleCheck, L, profile }: DayViewProps) {
+export default function DayView({ year, monthIdx, todayDay, habits, checks, numeric, monthStats, toggleCheck, L, profile, xp }: DayViewProps) {
   const now = new Date();
   const hour = now.getHours();
   const greeting = hour < 12 ? L.greeting.morning : hour < 19 ? L.greeting.afternoon : L.greeting.evening;
   const name = profile?.name || "";
-  const scheduled = habits.filter((h) => isHabitScheduledForDay(normalizeHabit(h).schedule, year, monthIdx, todayDay));
-  const done = scheduled.filter((h) => {
-    const hi = habits.indexOf(h);
-    return checks[makeKey(year, monthIdx, hi, todayDay)];
-  }).length;
+  const scheduled = habits.map((h, hi) => ({ h, hi })).filter(({ h }) => isHabitScheduledForDay(normalizeHabit(h).schedule, year, monthIdx, todayDay));
+  const done = scheduled.filter(({ hi }) => checks[makeKey(year, monthIdx, hi, todayDay)]).length;
   const total = scheduled.length;
   const pct = total ? done / total : 0;
   const color = pctColor(pct);
 
-  const totalXP = monthStats.habitPct.reduce((s, p) => s + Math.round(p * 100), 0);
-  const bestStreak = Math.max(...monthStats.streaks, 0);
+  const bestStreak = monthStats.streaks.reduce((a, b) => Math.max(a, b), 0);
   const daysComplete = monthStats.daysComplete;
   const monthName = L.months[monthIdx];
 
@@ -58,9 +55,9 @@ export default function DayView({ year, monthIdx, todayDay, habits, checks, nume
           <div style={{ fontSize: 10, color: "var(--fg4)" }}>{L.focus.consecutive}</div>
         </div>
         <div className="day-stat-card">
-          <div style={{ fontSize: 11, color: "var(--fg3)", marginBottom: 4 }}>⭐ {L.gamify.totalXP}</div>
-          <div style={{ fontFamily: "var(--fd)", fontSize: 22, fontWeight: 700, color: "var(--acc)" }}>{totalXP}</div>
-          <div style={{ fontSize: 10, color: "var(--fg4)" }}>{monthName}</div>
+          <div style={{ fontSize: 11, color: "var(--fg3)", marginBottom: 4 }}>⚔️ {L.gamify.totalXP}</div>
+          <div style={{ fontFamily: "var(--fd)", fontSize: 22, fontWeight: 700, color: "var(--gold)" }}>{xp.toLocaleString()}</div>
+          <div style={{ fontSize: 10, color: "var(--fg4)" }}>{L.gamify.totalXP}</div>
         </div>
       </div>
 
@@ -69,8 +66,7 @@ export default function DayView({ year, monthIdx, todayDay, habits, checks, nume
           {scheduled.length > 0 ? `${done}/${total} ${L.stats.habits}` : L.stats.noHabits}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          {scheduled.map((h, _) => {
-            const hi = habits.indexOf(h);
+          {scheduled.map(({ h, hi }) => {
             const habit = normalizeHabit(h);
             const checked = !!checks[makeKey(year, monthIdx, hi, todayDay)];
             const catColor = CATEGORIES.find(c => c.id === habit.cat)?.color || "var(--fg3)";

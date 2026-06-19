@@ -1,140 +1,163 @@
-# Forge — Arquitectura y guía para contribuidores
+# Forge — Architecture & Contributor Guide
 
-## Visión general
+## Overview
 
-Forge es una app de escritorio para Linux construida con **React + Electron**. Los datos se guardan localmente en `localStorage` — sin servidor, sin cuenta, sin tracking.
-
----
-
-## Stack tecnológico
-
-| Capa            | Tecnología                          | Por qué                                      |
-|-----------------|-------------------------------------|----------------------------------------------|
-| UI              | React 18 (functional + hooks)       | Reactivo, sin clases, fácil de contribuir    |
-| Bundler         | Vite 5                              | HMR instantáneo, builds rápidos              |
-| Desktop         | Electron 32                         | Acceso al sistema (notificaciones, tray)     |
-| Empaquetado     | electron-builder                    | AppImage + RPM para Linux                    |
-| Estilos         | CSS puro con variables              | Sin runtime CSS-in-JS, theming via `--var`   |
-| Fuentes         | Autohosteadas en `/public/fonts/`   | Funciona 100% offline                        |
-| Gráficas        | Chart.js 4 (npm, offline)           | Dependencia npm, funciona offline           |
-| Persistencia    | localStorage                        | Simple, offline, sin servidor                |
-| i18n            | JSON propio en `src/i18n/`          | Sin librería externa, fácil de extender      |
+Forge is a desktop application for Linux built with **React + Electron**. Data is stored locally in `localStorage` — no server, no account, no tracking.
 
 ---
 
-## Estructura de carpetas
+## Tech Stack
+
+| Layer | Technology | Why |
+|-------|------------|-----|
+| UI | React 18 (functional + hooks) | Reactive, no classes, easy to contribute |
+| Bundler | Vite 5 | Instant HMR, fast builds |
+| Desktop | Electron 40 | System access (notifications, tray) |
+| Packaging | electron-builder | AppImage + RPM for Linux |
+| Styling | CSS with custom properties | No runtime CSS-in-JS, theming via `--var` |
+| Fonts | Self-hosted in `/public/fonts/` | 100% offline |
+| Charts | Chart.js 4 (npm, offline) | Works offline |
+| Persistence | localStorage | Simple, offline, no server |
+| i18n | Custom JSON in `src/i18n/` | No external library, easy to extend |
+
+---
+
+## Folder Structure
 
 ```
 forge/
 ├── electron/
-│   ├── main.js        # Proceso principal: ventana, tray, notificaciones, IPC
-│   └── preload.js     # Puente seguro renderer ↔ main (contextBridge)
+│   ├── main.js        # Main process: window, tray, notifications, IPC
+│   └── preload.js     # Secure bridge renderer ↔ main (contextBridge)
 │
 ├── src/
-│   ├── App.jsx        # Raíz: estado global, navegación, mes activo
-│   ├── main.jsx       # Entry point React
+│   ├── App.tsx        # Root: global state, navigation, active month
+│   ├── main.tsx       # React entry point
 │   │
 │   ├── components/
-│   │   ├── Logo.jsx       # SVG del logo (usa --acc y --gold CSS vars)
-│   │   └── Onboarding.jsx # Wizard de primera instalación (4 pasos)
+│   │   ├── Logo.tsx       # SVG logo (uses --acc and --gold CSS vars)
+│   │   └── Onboarding.tsx # First-time setup wizard (4 steps)
 │   │
-│   ├── views/             # Una vista = una pantalla completa
-│   │   ├── TrackerView.jsx    # Grilla mensual con drag & drop
-│   │   ├── FocusView.jsx      # Modo hoy — cards grandes
-│   │   ├── StatsView.jsx      # Estadísticas + gráfica comparativa
-│   │   ├── HeatmapView.jsx    # Mapa de calor anual
-│   │   ├── GamifyView.jsx     # XP, niveles, badges
-│   │   └── ManageView.jsx     # Gestión de hábitos + settings + export
+│   ├── views/             # One view = one full screen
+│   │   ├── TrackerView.tsx    # Monthly grid with drag & drop
+│   │   ├── FocusView.tsx      # Today mode — large cards
+│   │   ├── StatsView.tsx      # Statistics + comparison chart
+│   │   ├── HeatmapView.tsx    # Annual heatmap
+│   │   ├── GamifyView.tsx     # XP, levels, badges
+│   │   └── ManageView.tsx     # Habit management + settings + export
+│   │
+│   ├── hooks/
+│   │   ├── useHabitData.ts        # Main data hook (state, persistence, IPC)
+│   │   ├── useGamificationWorker.ts # Web Worker for gamification
+│   │   ├── useUndo.ts             # Single-entry undo stack
+│   │   └── useAccent.ts           # Hook: injects accent palette into CSS vars
 │   │
 │   ├── utils/
-│   │   ├── storage.js     # loadData, saveData, makeKey, export/import
-│   │   ├── gamification.js# XP, niveles, badges — lógica pura
-│   │   ├── useAccent.js   # Hook: inyecta paleta de color en CSS vars
-│   │   └── sound.js       # Web Audio API — sonido al completar
+│   │   ├── storage.ts         # loadData, saveData, makeKey, export/import
+│   │   ├── gamification.ts    # XP, levels, badges — pure logic
+│   │   ├── gamification.worker.ts # Web Worker entry point
+│   │   ├── validate.ts        # Data validation and repair
+│   │   ├── db.ts              # IndexedDB wrapper (dual storage)
+│   │   ├── colors.ts          # Percentage color utility
+│   │   ├── constants.ts       # APP_NAME, VERSION
+│   │   └── sound.ts           # Web Audio API — check/uncheck sounds
 │   │
 │   ├── i18n/
-│   │   └── translations.js # ES + EN + PT — sin librería externa
+│   │   └── translations.ts  # ES + EN + PT — no external library
 │   │
-│   └── styles/
-│       └── global.css     # Variables CSS, temas, todos los componentes
+│   ├── styles/
+│   │   └── global.css       # CSS variables, themes, all components
+│   │
+│   └── test/
+│       ├── setup.ts             # Test setup (jest-dom)
+│       ├── gamification.test.ts # Gamification logic tests
+│       ├── storage.test.ts      # Storage persistence tests
+│       ├── validate.test.ts     # Validation tests
+│       └── FocusView.test.tsx   # FocusView component tests
 │
 ├── public/
-│   └── fonts/         # Fuentes WOFF2 (generadas con npm run download-fonts)
+│   └── fonts/         # WOFF2 fonts (generated with npm run download-fonts)
 │
 ├── scripts/
-│   └── download-fonts.js  # Descarga fuentes para uso offline
+│   └── download-fonts.js  # Downloads fonts for offline use
 │
 ├── docs/
-│   └── ARCHITECTURE.md    # Este archivo
+│   └── ARCHITECTURE.md    # This file
 │
-├── install.sh         # Instalador para Fedora/KDE (AppImage → .desktop)
+├── install.sh         # Installer for Fedora/KDE (AppImage → .desktop)
 ├── package.json
-├── vite.config.js
+├── vite.config.ts
 ├── LICENSE            # MIT
 └── README.md
 ```
 
 ---
 
-## Modelo de datos
+## Data Model
 
-### Formato de clave (KEY FORMAT)
+### Key Format
 
-**IMPORTANTE**: Las claves de checks usan formato numérico independiente del idioma:
+**IMPORTANT**: Check keys use a numeric format independent of language:
 
 ```
 "YYYY-MM-HI-DD"
-  YYYY = año (ej: 2026)
-  MM   = mes 01-12 (NO el nombre del mes)
-  HI   = índice del hábito 0-based
-  DD   = día del mes
+  YYYY = year (e.g.: 2026)
+  MM   = month 01-12 (NOT the month name)
+  HI   = habit index (0-based)
+  DD   = day of the month
 ```
 
-**Por qué**: Versiones anteriores usaban el nombre del mes en el idioma activo (`"2026-Enero-0-5"`). Al cambiar el idioma, todas las claves se rompían. La función `makeKey(year, month0, hi, day)` en `storage.js` genera el formato correcto.
+**Why**: Previous versions used the month name in the active language (`"2026-January-0-5"`). When changing language, all keys broke. The `makeKey(year, month0, hi, day)` function in `storage.ts` generates the correct format.
 
-### Estructura del localStorage (`forge_v131`)
+### localStorage Structure (`forge_v131`)
 
 ```typescript
 {
   version:   string,       // "1.3.1"
-  onboarded: boolean,      // false = mostrar onboarding
+  onboarded: boolean,      // false = show onboarding
   profile: {
-    name:      string,     // nombre del usuario
+    name:      string,     // user's name
     lang:      "es"|"en"|"pt",
     theme:     "dark"|"light",
-    accent:    string,     // id de ACCENT_PALETTES
+    accent:    string,     // id from ACCENT_PALETTES
     notifHour: number,     // 0-23
   },
   habits: Array<{
     name:  string,
     cat:   "salud"|"trabajo"|"mente"|"social"|"habitos"|"otro",
     type:  "boolean"|"negative"|"numeric",
-    goal?: number,         // solo para type:"numeric"
-    unit?: string,         // solo para type:"numeric"
+    goal?: number,         // only for type:"numeric"
+    unit?: string,         // only for type:"numeric"
+    schedule?: {
+      type: "daily" | "weekdays" | "interval",
+      days?: number[],     // 0=Sun..6=Sat for weekdays
+      interval?: number,   // every N days
+      startDay?: number,   // day of month when interval starts
+    },
   }>,
   checks:  Record<string, true>,   // "2026-06-3-15" → true
-  numeric: Record<string, number>, // "2026-06-13-5" → 6  (vasos de agua)
-  notes:   Record<string, string>, // "2026-06-15"   → "nota del día"
+  numeric: Record<string, number>, // "2026-06-13-5" → 6 (glasses of water)
+  notes:   Record<string, string>, // "2026-06-15"   → "daily note"
 }
 ```
 
-### Tipos de hábito
+### Habit Types
 
-| Tipo       | Comportamiento                                           |
-|------------|----------------------------------------------------------|
-| `boolean`  | Click → completado (check verde)                         |
-| `negative` | Click → fallaste (check dorado con ✗). 0 checks = bien  |
-| `numeric`  | Click izquierdo +1, clic derecho -1. Barra de progreso   |
+| Type | Behavior |
+|------|----------|
+| `boolean` | Click → completed (green check) |
+| `negative` | Click → failed (gold ✗). 0 checks = good |
+| `numeric` | Left click +1, right click -1. Progress bar |
 
 ---
 
-## Flujo de datos
+## Data Flow
 
 ```
 localStorage
     │
     ▼
-loadData() ──→ App.jsx (useState)
+loadData() ──→ App.tsx (useState)
                    │
                    ├── monthStats (useMemo) ──→ TrackerView, StatsView
                    ├── gamStats   (useMemo) ──→ GamifyView
@@ -145,24 +168,24 @@ loadData() ──→ App.jsx (useState)
 
 ---
 
-## Sistema de temas y colores
+## Theme & Color System
 
-Los colores se inyectan en `document.documentElement` via el hook `useAccent`:
+Colors are injected into `document.documentElement` via the `useAccent` hook:
 
 ```css
---acc       /* color principal del acento */
---acc-dim   /* versión con 15% opacidad */
---acc-glow  /* versión con 30% opacidad (para glow en checks) */
---acc-dark  /* versión oscura del acento */
---acc-1     /* para heatmap nivel 1 */
---acc-2     /* para heatmap nivel 2 */
+--acc       /* main accent color */
+--acc-dim   /* 15% opacity version */
+--acc-glow  /* 30% opacity version (for check glow) */
+--acc-dark  /* dark version of accent */
+--acc-1     /* for heatmap level 1 */
+--acc-2     /* for heatmap level 2 */
 ```
 
-El tema oscuro/claro se controla con la clase `.app.dark` / `.app.light` en el div raíz.
+Dark/light theme is controlled by the `.app.dark` / `.app.light` class on the root div.
 
 ---
 
-## Comunicación Electron ↔ React
+## Electron ↔ React Communication
 
 ```
 React                          Electron main
@@ -174,84 +197,84 @@ React                          Electron main
   └── window.electronAPI.onNavigate(cb)  ──← Tray menu click
 ```
 
-El `preload.js` expone solo las funciones necesarias via `contextBridge` — nunca `nodeIntegration: true`.
+The `preload.js` exposes only necessary functions via `contextBridge` — never `nodeIntegration: true`.
 
 ---
 
-## Gamificación
+## Gamification
 
-El sistema es **stateless**: se recalcula desde los checks en cada render.
+The system is **stateless**: it recalculates from checks on every render.
 
 ```
 computeStats(checks, habits)  →  { totalChecks, maxStreak, perfectDays, ... }
-computeXP(stats)              →  número de XP
+computeXP(stats)              →  XP number
 getLevel(xp)                  →  { level, name, xpMin, xpMax }
-getEarnedBadges(stats)        →  Badge[] con .earned boolean
+getEarnedBadges(stats)        →  Badge[] with .earned boolean
 ```
 
-Para agregar un badge: edita el array `BADGES` en `utils/gamification.js`.  
-Para agregar un nivel: edita el array `LEVELS`.
+To add a badge: edit the `BADGES` array in `utils/gamification.ts`.
+To add a level: edit the `LEVELS` array.
 
 ---
 
 ## i18n
 
-Agregar un idioma nuevo:
+To add a new language:
 
-1. Copia el objeto `es` en `src/i18n/translations.js`
-2. Traduce todos los strings
-3. Agrega el code (`"fr"`) y el flag emoji
-4. El onboarding lo mostrará automáticamente
-
----
-
-## Cómo agregar una vista nueva
-
-1. Crea `src/views/MiVista.jsx`
-2. Agrégala al array `navItems` en `App.jsx`
-3. Agrega `{view==="mi-vista" && <MiVista {...shared}/>}` en el JSX
-4. Agrega las traducciones en `src/i18n/translations.js` bajo cada idioma
+1. Copy the `es` object in `src/i18n/translations.ts`
+2. Translate all strings
+3. Add the code (`"fr"`) and flag emoji
+4. Onboarding will show it automatically
 
 ---
 
-## Convenciones de código
+## How to Add a New View
 
-- **Componentes**: functional + hooks, sin clases
-- **Estilos**: clases CSS en `global.css`, inline solo para valores dinámicos
-- **Estado global**: en `App.jsx` via `useState` + `update(patch)`
-- **Estado local**: `useState` dentro del componente que lo necesita
-- **Claves de checks**: siempre usar `makeKey(year, month0, hi, day)`
+1. Create `src/views/MyView.tsx`
+2. Add it to the `navItems` array in `App.tsx`
+3. Add `{view==="my-view"&&<MyView {...shared}/>}` in the JSX
+4. Add translations in `src/i18n/translations.ts` under each language
+
+---
+
+## Code Conventions
+
+- **Components**: functional + hooks, no classes
+- **Styling**: CSS classes in `global.css`, inline only for dynamic values
+- **Global state**: in `App.tsx` via `useState` + `update(patch)`
+- **Local state**: `useState` inside the component that needs it
+- **Check keys**: always use `makeKey(year, month0, hi, day)`
 - **Commits**: `feat:`, `fix:`, `docs:`, `style:`, `refactor:`
 
 ---
 
-## Roadmap sugerido
+## Roadmap
 
-- [ ] Vista semanal (7 días)
-- [ ] Sincronización opcional self-hosted (PocketBase / Supabase)
-- [ ] Múltiples perfiles de usuario
-- [ ] PWA instalable (sin Electron)
-- [ ] Importar desde Habitica CSV
-- [ ] Widget en el escritorio (KDE Plasma widget)
-- [ ] Tests con Vitest
+- [ ] Weekly view (7 days)
+- [ ] Optional self-hosted sync (PocketBase / Supabase)
+- [ ] Multiple user profiles
+- [ ] PWA (installable without Electron)
+- [ ] Import from Habitica CSV
+- [ ] KDE Plasma widget
+- [ ] More tests with Vitest
 
 ---
 
-## Changelog de correcciones (v1.3.1)
+## Changelog (v1.3.1)
 
-### Bugs críticos corregidos
+### Critical Bug Fixes
 
-| # | Archivo | Problema | Solución |
-|---|---------|----------|----------|
-| 1 | `gamification.js` | Usaba claves `"2026-Enero-0-5"` en lugar del formato numérico | Migrado a `"2026-01-0-5"` via regex `KEY_RE` |
-| 2 | `gamification.js` | Regex de streak no agrupaba por mes correctamente | Reescrito con `Map<hi, Map<monthKey, days[]>>` |
-| 3 | `App.jsx` | `today` era `const` fijo en módulo — se desactualizaba tras medianoche | `useState(getToday)` + `setInterval` cada 60s |
-| 4 | `App.jsx` | `onDailyCheck` registraba un nuevo listener en cada cambio de `habits`/`checks` | Movido a `useEffect(()=>{},[])` con `dataRef` para leer datos frescos |
-| 5 | `App.jsx` | `Math.max(...[])` = `-Infinity` con 0 hábitos → crash | Guard `if (habits.length===0)` antes del spread |
-| 6 | `TrackerView.jsx` | Drag remap con `indexOf` era O(n²); `newToOld` se construía pero nunca se usaba | Reemplazado por `Map` para O(n) |
-| 7 | `ManageView.jsx` | Settings locales no se sincronizaban al importar JSON | `useEffect` que sincroniza cuando `profile` cambia |
-| 8 | `storage.js` | `saveData` fallaba silenciosamente en `QuotaExceededError` | Retorna `boolean`; App muestra toast de error |
-| 9 | `storage.js` | CSV sin orden garantizado (`Object.keys` no ordenado) | `entries.sort((a,b) => año, mes, día)` antes de escribir |
-| 10 | `FocusView.jsx` | Usaba `today.getMonth()` en lugar de `monthIdx` de props | Prop `monthIdx` agregada y usada en `makeKey` |
-| 11 | `App.jsx` + `storage.js` | `notes` usaban formato ad-hoc, no `makeKey` | `makeNoteKey(year, month0, day)` centraliza el formato |
-| 12 | `TrackerView.jsx` | `useRef` importado pero nunca usado → warning en consola | Import eliminado |
+| # | File | Problem | Solution |
+|---|------|---------|----------|
+| 1 | `gamification.ts` | Used keys `"2026-January-0-5"` instead of numeric format | Migrated to `"2026-01-0-5"` via `KEY_RE` regex |
+| 2 | `gamification.ts` | Streak regex didn't group by month correctly | Rewritten with `Map<hi, Map<monthKey, days[]>>` |
+| 3 | `App.tsx` | `today` was a fixed `const` in module — got stale after midnight | `useState(getToday)` + `setInterval` every 60s |
+| 4 | `App.tsx` | `onDailyCheck` registered a new listener on every `habits`/`checks` change | Moved to `useEffect(()=>{},[])` with `dataRef` for fresh data |
+| 5 | `App.tsx` | `Math.max(...[])` = `-Infinity` with 0 habits → crash | Guard `if (habits.length===0)` before spread |
+| 6 | `TrackerView.tsx` | Drag remap with `indexOf` was O(n²); `newToOld` was built but never used | Replaced with `Map` for O(n) |
+| 7 | `ManageView.tsx` | Local settings didn't sync on JSON import | `useEffect` that syncs when `profile` changes |
+| 8 | `storage.ts` | `saveData` failed silently on `QuotaExceededError` | Returns `boolean`; App shows error toast |
+| 9 | `storage.ts` | CSV had no guaranteed order (`Object.keys` not ordered) | `entries.sort((a,b) => year, month, day)` before writing |
+| 10 | `FocusView.tsx` | Used `today.getMonth()` instead of `monthIdx` from props | Added and used `monthIdx` prop in `makeKey` |
+| 11 | `App.tsx` + `storage.ts` | `notes` used ad-hoc format, not `makeKey` | `makeNoteKey(year, month0, day)` centralizes format |
+| 12 | `TrackerView.tsx` | `useRef` imported but never used → console warning | Import removed |
