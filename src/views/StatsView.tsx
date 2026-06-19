@@ -220,6 +220,7 @@ export default function StatsView({
   const sorted = habits.map((h, hi) => {
     const habit = normalizeHabit(h);
     return {
+      hi,
       name:    habit.name,
       type:    habit.type,
       pct:     habitPct[hi] || 0,
@@ -348,8 +349,8 @@ export default function StatsView({
 
       <div className="card">
         <div className="section-title">{L.stats.ranking}</div>
-        {sorted.map(({ name, type, pct, streak, longest }, rank) => (
-          <div key={name + rank} className="ranking-item">
+        {sorted.map(({ hi, name, type, pct, streak, longest }, rank) => (
+          <div key={`${hi}-${name}`} className="ranking-item">
             <span className="ranking-pos">
               {rank < 3
                 ? ["🥇", "🥈", "🥉"][rank]

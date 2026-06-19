@@ -94,8 +94,8 @@ export interface ElectronAPI {
   notify: (title: string, body: string) => void;
   notifyStreakRisk: (habitName: string, streak: number, lang: string) => void;
   updateTrayTooltip: (done: number, total: number, pct: number) => void;
-  onDailyCheck: (cb: () => void) => void;
-  onNavigate: (cb: (view: string) => void) => void;
+  onDailyCheck: (cb: () => void) => (() => void);
+  onNavigate: (cb: (view: string) => void) => (() => void);
   setNotifHour: (hour: number) => void;
   getNotifHour: () => Promise<number>;
 }

@@ -88,6 +88,12 @@ export function useHabitData(): UseHabitDataReturn {
   const todayYear   = now.getFullYear();
 
   const { habits, checks, numeric, notes, profile, onboarded } = data;
+  const checksRef = useRef(checks);
+  const numericRef = useRef(numeric);
+  const notesRef = useRef(notes);
+  useEffect(() => { checksRef.current = checks; }, [checks]);
+  useEffect(() => { numericRef.current = numeric; }, [numeric]);
+  useEffect(() => { notesRef.current = notes; }, [notes]);
   const lang      = profile?.lang      || "es";
   const theme     = profile?.theme     || "dark";
   const accent    = profile?.accent    || "red";
@@ -109,16 +115,18 @@ export function useHabitData(): UseHabitDataReturn {
   useEffect(() => {
     const api = window.electronAPI;
     if (!api?.onNavigate) return;
-    api.onNavigate(v => setView(v));
+    const cleanup = api.onNavigate(v => setView(v));
+    return () => { if (cleanup) cleanup(); };
   }, []);
 
   const dataRef = useRef(data);
+  const userWrittenRef = useRef(false);
   useEffect(() => { dataRef.current = data; }, [data]);
 
   useEffect(() => {
     const api = window.electronAPI;
     if (!api?.onDailyCheck) return;
-    api.onDailyCheck(() => {
+    const cleanup = api.onDailyCheck(() => {
       const d    = dataRef.current;
       const m    = getToday().getMonth();
       const day  = getToday().getDate();
@@ -133,10 +141,12 @@ export function useHabitData(): UseHabitDataReturn {
         : Lnow.notif.progress.replace("{done}",String(done)).replace("{total}",String(total)).replace("{pct}",String(pct));
       api.notify(Lnow.notif.title, msg);
     });
+    return () => { if (cleanup) cleanup(); };
   }, []);
 
   useEffect(() => {
     loadDataAsync().then(fromDB => {
+      if (userWrittenRef.current) return;
       if (!fromDB || !fromDB.onboarded) return;
       const cleaned = archiveOldChecks(fromDB, 6);
       if (JSON.stringify(cleaned) !== JSON.stringify(fromDB)) {
@@ -146,7 +156,7 @@ export function useHabitData(): UseHabitDataReturn {
       } else if (JSON.stringify(fromDB) !== JSON.stringify(data)) {
         setData(fromDB);
       }
-    });
+    }).catch(() => {});
   }, []);
 
   function showToast(msg: string, type: string = "success"): void {
@@ -156,6 +166,7 @@ export function useHabitData(): UseHabitDataReturn {
   }
 
   function update(patch: Partial<Data>): void {
+    userWrittenRef.current = true;
     setData(d => {
       const next = {...d, ...patch};
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
@@ -172,8 +183,9 @@ export function useHabitData(): UseHabitDataReturn {
 
   const toggleCheck = useCallback((hi: number, day: number) => {
     const k = makeKey(year, monthIdx, hi, day);
-    const wasChecked = !!checks[k];
-    const next = {...checks};
+    const latestChecks = checksRef.current;
+    const wasChecked = !!latestChecks[k];
+    const next = {...latestChecks};
     if (wasChecked) { delete next[k]; playUncheck(); }
     else { next[k]=true; playCheck(); showToast("+10 XP", "gold"); }
     update({checks:next});
@@ -182,25 +194,28 @@ export function useHabitData(): UseHabitDataReturn {
       if (wasChecked) revert[k] = true; else delete revert[k];
       update({checks:revert});
     });
-  },[year,monthIdx,checks]);
+  },[year,monthIdx]);
 
   const setNumeric = useCallback((hi: number, day: number, val: number) => {
     const k    = makeKey(year, monthIdx, hi, day);
     const h    = habits[hi];
     const goal = h?.goal||1;
-    const nNum = {...(numeric||{})};
-    const nc   = {...checks};
+    const latestNum = numericRef.current;
+    const latestChecks = checksRef.current;
+    const nNum = {...(latestNum||{})};
+    const nc   = {...latestChecks};
     if (val<=0) { delete nNum[k]; delete nc[k]; }
     else { nNum[k]=val; if(val>=goal) nc[k]=true; else delete nc[k]; }
     update({numeric:nNum,checks:nc});
-  },[year,monthIdx,numeric,checks,habits]);
+  },[year,monthIdx,habits]);
 
   const setNote = useCallback((day: number, text: string) => {
     const k = makeNoteKey(year, monthIdx, day);
-    const next = {...(notes||{})};
+    const latestNotes = notesRef.current;
+    const next = {...(latestNotes||{})};
     if (text.trim()) next[k]=text; else delete next[k];
     update({notes:next});
-  },[year,monthIdx,notes]);
+  },[year,monthIdx]);
 
   function toggleTheme(): void { update({profile:{...profile,theme:theme==="dark"?"light":"dark"}}); }
 
@@ -219,8 +234,8 @@ export function useHabitData(): UseHabitDataReturn {
     const dailyCounts = Array.from({length:daysInMonth},(_: number,i: number)=>
       habits.filter((_: Habit, hi: number)=>checks[makeKey(year,monthIdx,hi,i+1)]).length
     );
-    const maxPct   = Math.max(...habitPct);
-    const minPct   = Math.min(...habitPct);
+    const maxPct   = habitPct.reduce((a, b) => Math.max(a, b), 0);
+    const minPct   = habitPct.reduce((a, b) => Math.min(a, b), 1);
     const bestIdx  = habitPct.indexOf(maxPct);
     const worstIdx = habitPct.indexOf(minPct);
     const daysComplete = dailyCounts.filter(c=>c===habits.length).length;
@@ -252,6 +267,12 @@ export function useHabitData(): UseHabitDataReturn {
     const pct = total ? Math.round(done / total * 100) : 0;
     api.updateTrayTooltip(done, total, pct);
   }, [checks, habits, year, monthIdx, todayDay, isCurrentMonth]);
+
+  useEffect(() => {
+    const api = window.electronAPI;
+    if (!api?.setNotifHour || profile?.notifHour == null) return;
+    api.setNotifHour(profile.notifHour);
+  }, [profile?.notifHour]);
 
   const gamResult = useGamificationWorker(checks, habits, data.archivedCheckCount || 0);
   const gamStats: GamStats = gamResult?.gamStats || { totalChecks:0, maxStreak:0, perfectDays:0, perfectWeeks:0, maxCombo:0, activeDaysMonth:0, categoriesUsed:0 };

@@ -34,11 +34,11 @@ export default function HeatmapView({ checks, habits, year, L, setYear, setMonth
   cells.forEach((c,i)=>{ const s=startDow+i; if(s<COLS*ROWS) grid[s]=c; });
   function hc(p: number){ return p===0?"heat-0":p<0.3?"heat-1":p<0.6?"heat-2":p<0.9?"heat-3":"heat-4"; }
 
-  const monthlyStats=L.months.map((_: string, m: number)=>{
+  const monthlyStats = useMemo(() => L.months.map((_: string, m: number)=>{
     const days=DAYS_IN_MONTH(year,m); let tot=0,pos=0;
     for(let d=1;d<=days;d++) habits.forEach((_,hi)=>{ pos++; if(checks[makeKey(year,m,hi,d)]) tot++; });
     return pos>0?tot/pos:0;
-  });
+  }),[checks,habits,year,L.months]);
 
   return (
     <div>

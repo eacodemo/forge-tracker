@@ -35,7 +35,7 @@ function createWindow() {
   mainWindow.on("close", e => {
     if (!app.isQuiting) {
       e.preventDefault();
-      mainWindow.hide();
+      mainWindow?.hide();
       if (tray) {
         tray.displayBalloon?.({
     title: "Forge",
@@ -94,17 +94,20 @@ function createTray() {
 }
 
 // ── IPC ──────────────────────────────────────────────────────────────────────
-ipcMain.on("notify", (_, { title, body }) => {
+ipcMain.on("notify", (_, payload) => {
+  if (!payload || typeof payload.title !== "string" || typeof payload.body !== "string") return;
   if (Notification.isSupported()) {
-    new Notification({ title, body, urgency: "normal" }).show();
+    new Notification({ title: payload.title, body: payload.body, urgency: "normal" }).show();
   }
 });
 
-ipcMain.on("notify-streak-risk", (_, { habitName, streak, lang }) => {
+ipcMain.on("notify-streak-risk", (_, payload) => {
+  if (!payload || typeof payload.habitName !== "string" || typeof payload.streak !== "number") return;
   if (Notification.isSupported()) {
+    const lang = typeof payload.lang === "string" ? payload.lang : "es";
     const msg = lang === "en"
-      ? `⚠️ Your streak on "${habitName}" (${streak} days) is at risk! Don't break it today.`
-      : `⚠️ Tu racha en "${habitName}" (${streak} días) está en riesgo. ¡No la rompas hoy!`;
+      ? `⚠️ Your streak on "${payload.habitName}" (${payload.streak} days) is at risk! Don't break it today.`
+      : `⚠️ Tu racha en "${payload.habitName}" (${payload.streak} días) está en riesgo. ¡No la rompas hoy!`;
     new Notification({ title: "Forge — Racha en riesgo", body: msg, urgency: "high" }).show();
   }
 });
@@ -112,16 +115,18 @@ ipcMain.on("notify-streak-risk", (_, { habitName, streak, lang }) => {
 let notifHour = 21;
 
 ipcMain.on("set-notif-hour", (_, hour) => {
+  if (typeof hour !== "number" || hour < 0 || hour > 23) return;
   notifHour = hour;
   scheduleDailyReminder(hour);
 });
 
 ipcMain.handle("get-notif-hour", () => notifHour);
 
-ipcMain.on("update-tray-tooltip", (_, { done, total, pct }) => {
+ipcMain.on("update-tray-tooltip", (_, payload) => {
+  if (!payload || typeof payload.done !== "number" || typeof payload.total !== "number" || typeof payload.pct !== "number") return;
   if (tray) {
-    const msg = total > 0
-      ? `Forge — ${done}/${total} (${pct}%)`
+    const msg = payload.total > 0
+      ? `Forge — ${payload.done}/${payload.total} (${payload.pct}%)`
       : "Forge";
     tray.setToolTip(msg);
   }
@@ -147,8 +152,10 @@ function autoBackup() {
 }
 
 // ── Daily reminder ───────────────────────────────────────────────────────────
+let dailyReminderTimer = null;
 function scheduleDailyReminder(hour = 21) {
   notifHour = hour;
+  if (dailyReminderTimer) clearTimeout(dailyReminderTimer);
   function fire() {
     mainWindow?.webContents.send("daily-check");
     // reschedule 24h later
@@ -156,13 +163,13 @@ function scheduleDailyReminder(hour = 21) {
     const next = new Date();
     next.setHours(hour, 0, 0, 0);
     if (next <= now) next.setDate(next.getDate() + 1);
-    setTimeout(fire, next - now);
+    dailyReminderTimer = setTimeout(fire, Math.max(0, next - now));
   }
   const now  = new Date();
   const first = new Date();
   first.setHours(hour, 0, 0, 0);
   if (first <= now) first.setDate(first.getDate() + 1);
-  setTimeout(fire, first - now);
+  dailyReminderTimer = setTimeout(fire, Math.max(0, first - now));
 }
 
 // ── App lifecycle ────────────────────────────────────────────────────────────

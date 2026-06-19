@@ -18,8 +18,8 @@ interface FocusViewProps {
 
 export default function FocusView({ year, monthIdx, todayDay, isCurrentMonth, habits, checks, monthStats, toggleCheck, L }: FocusViewProps) {
   const displayDay = isCurrentMonth ? todayDay : Math.min(todayDay, DAYS_IN_MONTH(year, monthIdx));
-  const scheduled = habits.filter((h) => isHabitScheduledForDay(normalizeHabit(h).schedule, year, monthIdx, displayDay));
-  const done  = scheduled.filter((h) => { const hi = habits.indexOf(h); return checks[makeKey(year,monthIdx,hi,displayDay)]; }).length;
+  const scheduled = habits.map((h, hi) => ({ h, hi })).filter(({ h }) => isHabitScheduledForDay(normalizeHabit(h).schedule, year, monthIdx, displayDay));
+  const done  = scheduled.filter(({ hi }) => checks[makeKey(year,monthIdx,hi,displayDay)]).length;
   const total = scheduled.length;
   const pct   = total ? done/total : 0;
   const monthName = L.months[monthIdx];

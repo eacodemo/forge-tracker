@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { ACCENT_PALETTES } from "../utils/storage.js";
 
+const ACCENT_VARS = ["--acc", "--acc-dim", "--acc-glow", "--acc-dark", "--acc-1", "--acc-2"];
+
 export function useAccent(accentId: string, theme: string): void {
   useEffect(() => {
     const palette = ACCENT_PALETTES.find(p => p.id === accentId) || ACCENT_PALETTES[0];
@@ -12,5 +14,6 @@ export function useAccent(accentId: string, theme: string): void {
     r.style.setProperty("--acc-dark", v.dark2);
     r.style.setProperty("--acc-1", v.dim.replace(/[\d.]+\)$/, "0.45)"));
     r.style.setProperty("--acc-2", v.dim.replace(/[\d.]+\)$/, "0.72)"));
+    return () => { ACCENT_VARS.forEach(v => r.style.removeProperty(v)); };
   }, [accentId, theme]);
 }
