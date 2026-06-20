@@ -3,7 +3,10 @@
   "version": "1.3.2",
   "description": "Forge — app de escritorio Linux open source",
   "private": true,
-  "author": "eacodemo",
+  "author": {
+    "name": "eacodemo",
+    "email": "eacodemo@gmail.com"
+  },
   "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
