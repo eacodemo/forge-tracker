@@ -5,7 +5,7 @@
 Your daily habit tracker — offline, private, open source.
 
 ![License MIT](https://img.shields.io/badge/license-MIT-green)
-![Version](https://img.shields.io/badge/version-1.3.1-blue)
+![Version](https://img.shields.io/badge/version-1.3.2-blue)
 ![Platform](https://img.shields.io/badge/platform-Linux-lightgrey)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 

@@ -4,7 +4,7 @@ import ManageView from "../views/ManageView";
 import type { Data } from "../types";
 
 const baseData: Data = {
-  version: "1.3.1",
+  version: "1.3.2",
   onboarded: true,
   profile: { name: "Test", lang: "es", theme: "dark", accent: "red", notifHour: 21 },
   habits: [
