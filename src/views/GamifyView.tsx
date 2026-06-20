@@ -1,4 +1,5 @@
 import { LEVELS } from "../utils/gamification";
+import { loadChallengeStore, getChallengeXP } from "../utils/challenges";
 import type { Level, Badge, GamStats } from "../types";
 import type { TranslationSet } from "../i18n/translations";
 
@@ -17,6 +18,9 @@ export default function GamifyView({ xp, levelData, xpPct, badges, earnedCount, 
   const nextLevel = LEVELS.find(l=>l.level===levelData.level+1);
   const xpToNext  = nextLevel?nextLevel.xpMin-xp:0;
   const levelNames = G.levelNames || [];
+  const challengeStore = loadChallengeStore();
+  const challengeXP = getChallengeXP(challengeStore);
+  const completedChallenges = challengeStore.challenges.filter(c => c.status === "completed").length;
   return (
     <div style={{ maxWidth:700 }}>
       <div className="card" style={{ marginBottom:14, borderColor:"var(--gold)", background:"linear-gradient(135deg,var(--sf) 60%,var(--gold-dim))" }}>
@@ -50,6 +54,7 @@ export default function GamifyView({ xp, levelData, xpPct, badges, earnedCount, 
           { label:G.perfectDaysG||"Días perfectos", value:gamStats.perfectDays, icon:"🌟" },
           { label:G.perfectWeeks||"Semanas perf.", value:gamStats.perfectWeeks, icon:"🏆" },
           { label:G.activeDaysG||"Días activos", value:gamStats.activeDaysMonth, icon:"📅" },
+          { label:L.challenges?.completed || "Desafíos", value:completedChallenges, icon:"🎯" },
         ].map(s=>(
           <div key={s.label} className="stat-card" style={{ textAlign:"center" }}>
             <div style={{ fontSize:20 }}>{s.icon}</div>

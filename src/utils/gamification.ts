@@ -1,4 +1,6 @@
 import type { GamStats, Level, Badge } from "../types";
+import { computeMaxStreakCrossMonth } from "./streaks";
+import { getChallengeXP, loadChallengeStore } from "./challenges";
 
 export const XP = {
   CHECK:10, STREAK_7:50, STREAK_14:100, STREAK_30:200, STREAK_60:500, STREAK_100:1000,
@@ -45,29 +47,7 @@ export function computeStats(checks: Record<string, true>, habits: { length: num
   for (let i=0; i<habits.length; i++) if (habits[i]?.cat) cats.add(habits[i]!.cat!);
   const categoriesUsed = cats.size;
 
-  const byHabit: Record<string, Record<string, number[]>> = {};
-  Object.keys(checks).forEach(k => {
-    const m = k.match(KEY_RE);
-    if (!m) return;
-    const [, yr, mm, hi, day] = m;
-    const mk = `${yr}-${mm}`;
-    if (!byHabit[hi]) byHabit[hi] = {};
-    if (!byHabit[hi][mk]) byHabit[hi][mk] = [];
-    byHabit[hi][mk].push(parseInt(day));
-  });
-
-  let maxStreak = 0;
-  Object.values(byHabit).forEach(monthMap => {
-    Object.values(monthMap).forEach(days => {
-      const sorted = [...new Set(days)].sort((a,b)=>a-b);
-      let cur = 1;
-      for (let i=1; i<sorted.length; i++) {
-        cur = sorted[i]===sorted[i-1]+1 ? cur+1 : 1;
-        maxStreak = Math.max(maxStreak, cur);
-      }
-      if (sorted.length>0) maxStreak = Math.max(maxStreak, cur);
-    });
-  });
+  const maxStreak = computeMaxStreakCrossMonth(checks, habits.length);
 
   const now = new Date();
   const yr  = now.getFullYear();
@@ -75,7 +55,6 @@ export function computeStats(checks: Record<string, true>, habits: { length: num
   const dim = new Date(yr, now.getMonth()+1, 0).getDate();
 
   let perfectDays=0, activeDays=0, weekPerfect=0, perfectWeeks=0, maxCombo=0, curCombo=0;
-  const seenCats = new Set<string>();
   for (let d=1; d<=dim; d++) {
     const cnt = Array.from({length: habits.length}, (_, hi) => checks[`${yr}-${mm}-${hi}-${d}`] ? 1 : 0).filter(Boolean).length;
     if (cnt>0) activeDays++;
@@ -94,7 +73,7 @@ export function computeStats(checks: Record<string, true>, habits: { length: num
 }
 
 export function computeXP(stats: GamStats): number {
-  return stats.totalChecks*XP.CHECK +
+  const baseXP = stats.totalChecks*XP.CHECK +
     (stats.maxStreak>=7?XP.STREAK_7:0) +
     (stats.maxStreak>=14?XP.STREAK_14:0) +
     (stats.maxStreak>=30?XP.STREAK_30:0) +
@@ -104,6 +83,9 @@ export function computeXP(stats: GamStats): number {
     stats.perfectWeeks*XP.PERFECT_WEEK +
     (stats.maxCombo>=28?XP.PERFECT_MONTH:0) +
     (stats.categoriesUsed>=4?XP.VARIETY:0);
+  const store = loadChallengeStore();
+  const challengeXP = getChallengeXP(store);
+  return baseXP + challengeXP;
 }
 
 export function getLevel(xp: number): Level {

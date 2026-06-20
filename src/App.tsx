@@ -12,6 +12,7 @@ const FocusView   = lazy(() => import("./views/FocusView"));
 const ManageView  = lazy(() => import("./views/ManageView"));
 const GamifyView  = lazy(() => import("./views/GamifyView"));
 const DayView     = lazy(() => import("./views/DayView"));
+const ChallengesView = lazy(() => import("./views/ChallengesView"));
 
 export default function App() {
   const {
@@ -25,19 +26,20 @@ export default function App() {
 
   const userName = profile?.name || "";
   const navItems = [
-    {id:"day",    icon:"☀️", label:"Hoy"  },
-    {id:"tracker",icon:"📅",label:L.nav.tracker},
-    {id:"focus",  icon:"🎯",label:L.nav.today  },
-    {id:"stats",  icon:"📊",label:L.nav.stats  },
-    {id:"heatmap",icon:"🔥",label:L.nav.heatmap},
-    {id:"gamify", icon:"⚔️", label:L.nav.xp     },
-    {id:"manage", icon:"⚙️", label:L.nav.habits },
+    {id:"day",        icon:"☀️", label:"Hoy"  },
+    {id:"tracker",    icon:"📅", label:L.nav.tracker},
+    {id:"focus",      icon:"🎯", label:L.nav.today  },
+    {id:"challenges", icon:"🏆", label:L.challenges?.title || "Desafíos" },
+    {id:"stats",      icon:"📊", label:L.nav.stats  },
+    {id:"heatmap",    icon:"🔥", label:L.nav.heatmap},
+    {id:"gamify",     icon:"⚔️", label:L.nav.xp     },
+    {id:"manage",     icon:"⚙️", label:L.nav.habits },
   ];
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.ctrlKey && e.key === "z") { e.preventDefault(); undo(); }
-      const viewMap: Record<string, string> = { "1":"day", "2":"tracker", "3":"focus", "4":"stats", "5":"heatmap", "6":"gamify", "7":"manage" };
+      const viewMap: Record<string, string> = { "1":"day", "2":"tracker", "3":"focus", "4":"challenges", "5":"stats", "6":"heatmap", "7":"gamify", "8":"manage" };
       if (e.ctrlKey && viewMap[e.key]) { e.preventDefault(); setView(viewMap[e.key]); }
     }
     window.addEventListener("keydown", onKey);
@@ -101,6 +103,7 @@ export default function App() {
             <ErrorBoundary name="StatsView">{view==="stats"&&<StatsView monthIdx={monthIdx} year={year} monthName={monthName} daysInMonth={daysInMonth} habits={habits} checks={checks} monthStats={monthStats} L={L} theme={theme}/>}</ErrorBoundary>
             <ErrorBoundary name="HeatmapView">{view==="heatmap"&&<HeatmapView checks={checks} habits={habits} year={year} L={L} setYear={setYear} setMonthIdx={setMonthIdx} setView={setView}/>}</ErrorBoundary>
             <ErrorBoundary name="GamifyView">{view==="gamify"&&<GamifyView xp={xp} levelData={levelData} xpPct={xpPct} badges={badges} earnedCount={badges.filter(b=>b.earned).length} gamStats={gamStats} L={L}/>}</ErrorBoundary>
+            <ErrorBoundary name="ChallengesView">{view==="challenges"&&<ChallengesView habits={habits} checks={checks} year={year} monthIdx={monthIdx} todayDay={todayDay} L={L}/>}</ErrorBoundary>
             <ErrorBoundary name="ManageView">{view==="manage"&&<ManageView habits={habits} data={data} update={update} showToast={showToast} L={L} lang={lang} profile={profile}/>}</ErrorBoundary>
           </Suspense>
         </div>

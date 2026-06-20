@@ -100,6 +100,40 @@ export interface ElectronAPI {
   getNotifHour: () => Promise<number>;
 }
 
+export type ChallengeType = "racha" | "consistencia" | "variedad" | "superacion" | "recuperacion";
+export type ChallengeDifficulty = "easy" | "medium" | "hard";
+export type ChallengeStatus = "active" | "completed" | "expired" | "failed";
+
+export interface Challenge {
+  id: string;
+  type: ChallengeType;
+  title: string;
+  description: string;
+  habitIdx?: number;
+  target: number;
+  current: number;
+  xpReward: number;
+  difficulty: ChallengeDifficulty;
+  createdAt: string;
+  expiresAt: string;
+  completedAt?: string;
+  status: ChallengeStatus;
+}
+
+export interface ChallengeConfig {
+  dailyEnabled: boolean;
+  weeklyEnabled: boolean;
+  maxActive: number;
+  difficulty: ChallengeDifficulty;
+}
+
+export interface ChallengeStore {
+  challenges: Challenge[];
+  config: ChallengeConfig;
+  completedTotal: number;
+  lastGenerated: string;
+}
+
 declare global {
   interface Window {
     electronAPI?: ElectronAPI;

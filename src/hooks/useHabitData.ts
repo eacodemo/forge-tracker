@@ -5,6 +5,7 @@ import { useAccent } from "./useAccent";
 import { playCheck, playUncheck } from "../utils/sound";
 import { useGamificationWorker } from "./useGamificationWorker";
 import { useUndo } from "./useUndo";
+import { computeStreaksCrossMonth } from "../utils/streaks";
 import type { Data, MonthStats, Level, Badge, GamStats, Habit } from "../types";
 import type { TranslationSet } from "../i18n/translations";
 
@@ -242,11 +243,7 @@ export function useHabitData(): UseHabitDataReturn {
     const above80  = habitPct.filter(p=>p>=0.8).length;
     const generalPct = habitPct.reduce((a,b)=>a+b,0)/habits.length;
 
-    const streaks = habits.map((_: Habit, hi: number)=>{
-      let s=0, max=isCurrentMonth?todayDay:daysInMonth;
-      for(let d=max;d>=1;d--){ if(checks[makeKey(year,monthIdx,hi,d)]) s++; else break; }
-      return s;
-    });
+    const streaks = computeStreaksCrossMonth(checks, habits.length, year, monthIdx, isCurrentMonth ? todayDay : daysInMonth);
     const longestStreaks = habits.map((_: Habit, hi: number)=>{
       let best=0,cur=0;
       for(let d=1;d<=daysInMonth;d++){
