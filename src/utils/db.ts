@@ -6,6 +6,9 @@ const STORE   = "data";
 const KEY     = "forge_v131";
 
 function openDB(): Promise<IDBDatabase> {
+  if (typeof indexedDB === "undefined") {
+    return Promise.reject(new Error("IndexedDB is not available in this environment"));
+  }
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, 1);
     req.onupgradeneeded = () => req.result.createObjectStore(STORE);

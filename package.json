@@ -53,12 +53,7 @@
         "rpm",
         "deb"
       ],
-      "category": "Utility",
-      "desktop": {
-        "Name": "Forge",
-        "Comment": "Tracker de hábitos diarios",
-        "Categories": "Utility;Office;"
-      }
+      "category": "Utility"
     }
   }
 }
