@@ -21,6 +21,7 @@ export interface TranslationSet {
   notif: Record<string, string>;
   catNames: Record<string, string>;
   errorBoundary: Record<string, string>;
+  challenges: Record<string, string>;
 }
 
 export const LANGS: Record<string, TranslationSet> = {
@@ -82,6 +83,7 @@ export const LANGS: Record<string, TranslationSet> = {
     notif: { title:"Forge — Repaso del día 🎯", perfect:"¡Completaste todos los hábitos! 🏆", progress:"Llevas {done}/{total} ({pct}%). ¡Sigue!" },
     catNames: { salud:"Salud", trabajo:"Trabajo", mente:"Mente", social:"Social", habitos:"Rutina", otro:"Otro" },
     errorBoundary: { title:"Algo salió mal", message:"Forge encontró un error inesperado. Tus datos están seguros. Puedes intentar recuperarte o reiniciar la vista.", detail:"Detalle técnico", retry:"Reintentar", reload:"Recargar app", nuke:"Limpiar datos", nukeTitle:"¿Borrar todos los datos?", nukeMessage:"Esta acción no se puede deshacer. Se eliminarán todos tus hábitos, checks y configuración.", confirmLabel:"Eliminar todo", cancelLabel:"Cancelar" },
+    challenges: { title:"Desafíos", active:"Activos", completed:"Completados", expired:"Expirados", noActive:"No hay desafíos activos", generate:"Generar nuevos", config:"Configuración", daily:"Diarios", difficulty:"Dificultad", easy:"Fácil", medium:"Medio", hard:"Difícil", xpReward:"recompensa", expiresIn:"expira en", completedToday:"completados hoy", streak:"racha de desafíos", totalXP:"XP ganado", progress:"progreso", congrats:"¡Desafío completado!", reward:"+{xp} XP" },
   },
   en: {
     code: "en", name: "English", flag: "🇬🇧",
@@ -141,6 +143,7 @@ export const LANGS: Record<string, TranslationSet> = {
     notif: { title:"Forge — Daily check 🎯", perfect:"All habits completed today! 🏆", progress:"You have {done}/{total} ({pct}%). Keep going!" },
     catNames: { salud:"Health", trabajo:"Work", mente:"Mind", social:"Social", habitos:"Routine", otro:"Other" },
     errorBoundary: { title:"Something went wrong", message:"Forge encountered an unexpected error. Your data is safe. You can try to recover or restart the view.", detail:"Technical details", retry:"Retry", reload:"Reload app", nuke:"Clear data", nukeTitle:"Delete all data?", nukeMessage:"This action cannot be undone. All your habits, checks, and settings will be removed.", confirmLabel:"Delete all", cancelLabel:"Cancel" },
+    challenges: { title:"Challenges", active:"Active", completed:"Completed", expired:"Expired", noActive:"No active challenges", generate:"Generate new", config:"Settings", daily:"Daily", difficulty:"Difficulty", easy:"Easy", medium:"Medium", hard:"Hard", xpReward:"reward", expiresIn:"expires in", completedToday:"completed today", streak:"challenge streak", totalXP:"XP earned", progress:"progress", congrats:"Challenge completed!", reward:"+{xp} XP" },
   },
   pt: {
     code: "pt", name: "Português", flag: "🇧🇷",
@@ -200,6 +203,7 @@ export const LANGS: Record<string, TranslationSet> = {
     notif: { title:"Forge — Revisão do dia 🎯", perfect:"Todos os hábitos concluídos hoje! 🏆", progress:"Você tem {done}/{total} ({pct}%). Continue!" },
     catNames: { salud:"Saúde", trabajo:"Trabalho", mente:"Mente", social:"Social", habitos:"Rotina", outro:"Outro" },
     errorBoundary: { title:"Algo deu errado", message:"Forge encontrou um erro inesperado. Seus dados estão seguros. Você pode tentar se recuperar ou reiniciar a visualização.", detail:"Detalhes técnicos", retry:"Tentar novamente", reload:"Recarregar app", nuke:"Limpar dados", nukeTitle:"Apagar todos os dados?", nukeMessage:"Esta ação não pode ser desfeita. Todos os seus hábitos, verificações e configurações serão removidos.", confirmLabel:"Apagar tudo", cancelLabel:"Cancelar" },
+    challenges: { title:"Desafios", active:"Ativos", completed:"Concluídos", expired:"Expirados", noActive:"Nenhum desafio ativo", generate:"Gerar novos", config:"Configuração", daily:"Diários", difficulty:"Dificuldade", easy:"Fácil", medium:"Médio", hard:"Difícil", xpReward:"recompensa", expiresIn:"expira em", completedToday:"concluídos hoje", streak:"sequência de desafios", totalXP:"XP ganho", progress:"progresso", congrats:"Desafio concluído!", reward:"+{xp} XP" },
   },
 };
 

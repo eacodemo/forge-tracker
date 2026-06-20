@@ -1,5 +1,6 @@
 import { makeKey, isHabitScheduledForDay, normalizeHabit, CATEGORIES } from "../utils/storage";
 import { pctColor } from "../utils/colors";
+import { loadChallengeStore, getActiveChallenges } from "../utils/challenges";
 import type { Habit, MonthStats, Profile } from "../types";
 import type { TranslationSet } from "../i18n/translations";
 
@@ -32,6 +33,10 @@ export default function DayView({ year, monthIdx, todayDay, habits, checks, nume
   const daysComplete = monthStats.daysComplete;
   const monthName = L.months[monthIdx];
 
+  const challengeStore = loadChallengeStore();
+  const activeChallenges = getActiveChallenges(challengeStore);
+  const topChallenge = activeChallenges[0];
+
   return (
     <div style={{ maxWidth: 600, margin: "0 auto", display: "flex", flexDirection: "column", gap: 18 }}>
       <div style={{ textAlign: "center", padding: "28px 0 12px" }}>
@@ -45,6 +50,34 @@ export default function DayView({ year, monthIdx, todayDay, habits, checks, nume
             .replace("{year}", String(year))}
         </div>
       </div>
+
+      {topChallenge && (
+        <div className="card" style={{
+          padding: "10px 14px",
+          borderColor: "var(--gold)",
+          background: "linear-gradient(135deg, var(--sf) 60%, var(--gold-dim))",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 16 }}>🏆</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--fg)" }}>{topChallenge.title}</div>
+              <div style={{ fontSize: 10, color: "var(--fg3)" }}>{topChallenge.description}</div>
+            </div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--gold)" }}>
+              {topChallenge.current}/{topChallenge.target}
+            </div>
+          </div>
+          <div style={{ height: 4, borderRadius: 99, background: "var(--sf3)", marginTop: 6, overflow: "hidden" }}>
+            <div style={{
+              height: "100%",
+              width: `${Math.min((topChallenge.current / topChallenge.target) * 100, 100)}%`,
+              borderRadius: 99,
+              background: "var(--gold)",
+              transition: "width 0.3s ease",
+            }} />
+          </div>
+        </div>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
         <div className="day-stat-card">
