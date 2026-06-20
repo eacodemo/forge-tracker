@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Build packages (AppImage + RPM + DEB)
+        run: npx electron-builder --linux AppImage rpm deb --publish never
+
+      - name: Get version
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Upload artifacts to release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            dist-electron/Forge-${{ steps.version.outputs.version }}.AppImage
+            dist-electron/forge-${{ steps.version.outputs.version }}.rpm
+            dist-electron/forge-${{ steps.version.outputs.version }}.deb
+          fail_on_unmatched_files: false

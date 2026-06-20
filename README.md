@@ -76,12 +76,13 @@
 
 | Distribution | Status | Package Format |
 |--------------|--------|----------------|
-| 🟣 Fedora / KDE | ✅ Fully supported | AppImage + RPM |
-| 🟠 Ubuntu / Debian | ✅ Compatible | AppImage |
+| 🟣 Fedora / KDE | ✅ Fully supported | RPM + AppImage |
+| 🟠 Ubuntu / Debian | ✅ Fully supported | DEB + AppImage |
 | 🔵 Arch / Manjaro | ✅ Compatible | AppImage |
-| 🟢 Linux Mint | ✅ Compatible | AppImage |
+| 🟢 Linux Mint | ✅ Fully supported | DEB + AppImage |
+| 🟡 openSUSE | ✅ Compatible | RPM + AppImage |
 
-> **Note:** Pre-built AppImages run on any Linux distribution without dependencies.
+> **Note:** Pre-built packages (RPM, DEB, AppImage) run on any Linux distribution.
 > Requirements above apply only when building from source.
 
 ### Experimental: macOS / Windows
@@ -97,18 +98,26 @@ npx electron-builder --mac    # or --win
 
 ## Quick Start
 
-### 🚀 Option A: Download (recommended)
-
-Download the latest **Forge-1.3.1.AppImage** from [Releases](https://github.com/eacodemo/forge-tracker/releases), then:
+### 🚀 Instalación rápida (una línea)
 
 ```bash
-chmod +x Forge-1.3.1.AppImage
-./Forge-1.3.1.AppImage
+curl -sSL https://raw.githubusercontent.com/eacodemo/forge-tracker/main/install.sh | bash
 ```
 
-**No dependencies required** — it's a self-contained executable that runs on any Linux distribution.
+El script detecta tu distro automáticamente, descarga el paquete correcto y lo instala.
 
-### 🔧 Option B: Build from source
+### 📦 Por distro
+
+| Distro | Comando |
+|--------|---------|
+| Fedora / RHEL / CentOS | `sudo dnf install ./forge-*.rpm` |
+| Ubuntu / Debian / Mint | `sudo apt install ./forge-*.deb` |
+| Arch / Manjaro | Descargar AppImage de [Releases](https://github.com/eacodemo/forge-tracker/releases) |
+| openSUSE | `sudo zypper install ./forge-*.rpm` |
+
+Los paquetes `.rpm`, `.deb` y `.AppImage` están disponibles en [Releases](https://github.com/eacodemo/forge-tracker/releases).
+
+### 🔧 Build from source
 
 **Prerequisites:** Node.js 18+, npm
 
@@ -143,7 +152,8 @@ The script builds the app and installs it to your system automatically.
 | `npm run electron:dev` | Start dev server + Electron (hot reload) |
 | `npm run build` | Build for production |
 | `npm test` | Run tests |
-| `npm run electron:build` | Build package (AppImage + RPM) |
+| `npm run electron:build` | Build package (AppImage + RPM + DEB) |
+| `./scripts/build-packages.sh` | Build all packages locally |
 
 ---
 
@@ -154,7 +164,7 @@ The script builds the app and installs it to your system automatically.
 | 🖼️ **UI** | React 18 (functional + hooks) | Reactive, no classes, easy to contribute |
 | ⚡ **Bundler** | Vite 5 | Instant HMR, fast builds |
 | 🖥️ **Desktop** | Electron 32 | System access (notifications, tray) |
-| 📦 **Packaging** | electron-builder | AppImage + RPM for Linux |
+| 📦 **Packaging** | electron-builder | AppImage + RPM + DEB for Linux |
 | 🎨 **Styling** | CSS with custom properties | No runtime CSS-in-JS, theming via `--var` |
 | 🔤 **Fonts** | Self-hosted in `/public/fonts/` | 100% offline |
 | 📈 **Charts** | Chart.js 4 (npm, offline) | Works offline |
