@@ -112,7 +112,7 @@ export default function DayView({ year, monthIdx, todayDay, habits, checks, nume
               <div key={hi} className={`day-habit-card${checked ? " done" : ""}`}
                 onClick={() => toggleCheck(hi, todayDay)}
                 role="button" tabIndex={0}
-                aria-label={`${habit.name}: ${checked ? "completado" : "pendiente"}`}
+                aria-label={`${habit.name}: ${checked ? L.dayView.completed : L.dayView.pending}`}
                 onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleCheck(hi, todayDay); } }}>
                 <span className="cat-dot" style={{ background: catColor, width: 10, height: 10 }} />
                 <div style={{ flex: 1 }}>

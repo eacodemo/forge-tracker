@@ -29,7 +29,7 @@ export default function ChallengesView({ habits, checks, year, monthIdx, todayDa
   }, []);
 
   const generateNew = useCallback(() => {
-    const newChallenges = generateDailyChallenges(habits, checks, year, monthIdx, todayDay, store.config);
+    const newChallenges = generateDailyChallenges(habits, checks, year, monthIdx, todayDay, store.config, L);
     if (newChallenges.length > 0) {
       const updated = {
         ...store,

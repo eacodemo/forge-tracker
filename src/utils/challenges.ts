@@ -1,4 +1,5 @@
 import type { Challenge, ChallengeConfig, ChallengeStore, ChallengeType, ChallengeDifficulty, Habit } from "../types";
+import type { TranslationSet } from "../i18n/translations";
 import { computeStreakCrossMonth } from "./streaks";
 import { DAYS_IN_MONTH } from "../i18n/translations";
 
@@ -136,6 +137,7 @@ function generateRacha(
   month: number,
   todayDay: number,
   difficulty: ChallengeDifficulty,
+  L: TranslationSet,
 ): Challenge | null {
   const withStreaks = habits
     .map((h, i) => ({ idx: i, name: h.name, streak: computeStreakCrossMonth(checks, i, year, month, todayDay) }))
@@ -154,8 +156,8 @@ function generateRacha(
   return {
     id: randomId(),
     type: "racha",
-    title: `🔥 Racha: ${best.name}`,
-    description: `Mantén tu racha de ${best.name} por ${target - best.streak} días más`,
+    title: L.challenges.rachaTitle.replace("{name}", best.name),
+    description: L.challenges.rachaDesc.replace("{name}", best.name).replace("{days}", String(target - best.streak)),
     habitIdx: best.idx,
     target,
     current: best.streak,
@@ -174,6 +176,7 @@ function generateConsistencia(
   month: number,
   todayDay: number,
   difficulty: ChallengeDifficulty,
+  L: TranslationSet,
 ): Challenge | null {
   if (habits.length === 0) return null;
   let avg = 0;
@@ -199,8 +202,8 @@ function generateConsistencia(
   return {
     id: randomId(),
     type: "consistencia",
-    title: `📊 Consistencia`,
-    description: `Cumple ${target} hábitos hoy`,
+    title: L.challenges.consistenciaTitle,
+    description: L.challenges.consistenciaDesc.replace("{n}", String(target)),
     target,
     current: 0,
     xpReward: XP_REWARDS.consistencia[difficulty],
@@ -218,6 +221,7 @@ function generateVariedad(
   month: number,
   todayDay: number,
   difficulty: ChallengeDifficulty,
+  L: TranslationSet,
 ): Challenge | null {
   const catsUsed = new Set<string>();
   habits.forEach(h => { if (h.cat) catsUsed.add(h.cat); });
@@ -235,8 +239,8 @@ function generateVariedad(
   return {
     id: randomId(),
     type: "variedad",
-    title: `🎨 Variedad`,
-    description: `Usa ${target} categorías diferentes hoy`,
+    title: L.challenges.variedadTitle,
+    description: L.challenges.variedadDesc.replace("{n}", String(target)),
     target,
     current: thisWeekCats,
     xpReward: XP_REWARDS.variedad[difficulty],
@@ -254,6 +258,7 @@ function generateSuperacion(
   month: number,
   todayDay: number,
   difficulty: ChallengeDifficulty,
+  L: TranslationSet,
 ): Challenge | null {
   let bestDay = 0;
   let bestPct = 0;
@@ -274,8 +279,8 @@ function generateSuperacion(
   return {
     id: randomId(),
     type: "superacion",
-    title: `⚔️ Superación`,
-    description: `Supera tu mejor día (${Math.round(bestPct * 100)}%)`,
+    title: L.challenges.superacionTitle,
+    description: L.challenges.superacionDesc.replace("{pct}", String(Math.round(bestPct * 100))),
     target,
     current: 0,
     xpReward: XP_REWARDS.superacion[difficulty],
@@ -292,6 +297,7 @@ function generateRecuperacion(
   year: number,
   month: number,
   difficulty: ChallengeDifficulty,
+  L: TranslationSet,
 ): Challenge | null {
   const candidates = findRecoveryHabits(habits, checks, year, month);
   if (candidates.length === 0) return null;
@@ -300,8 +306,8 @@ function generateRecuperacion(
   return {
     id: randomId(),
     type: "recuperacion",
-    title: `🔄 Recuperación: ${pick.name}`,
-    description: `Vuelve a completar ${pick.name} (lo dejaste hace ${pick.daysSince} días)`,
+    title: L.challenges.recuperacionTitle.replace("{name}", pick.name),
+    description: L.challenges.recuperacionDesc.replace("{name}", pick.name).replace("{days}", String(pick.daysSince)),
     habitIdx: pick.idx,
     target: 1,
     current: 0,
@@ -320,6 +326,7 @@ export function generateDailyChallenges(
   month: number,
   todayDay: number,
   config: ChallengeConfig,
+  L: TranslationSet,
 ): Challenge[] {
   const store = loadChallengeStore();
   const activeCount = store.challenges.filter(c => c.status === "active").length;
@@ -327,11 +334,11 @@ export function generateDailyChallenges(
   if (slotsAvailable <= 0) return [];
 
   const generators: (() => Challenge | null)[] = [
-    () => generateRacha(habits, checks, year, month, todayDay, config.difficulty),
-    () => generateConsistencia(habits, checks, year, month, todayDay, config.difficulty),
-    () => generateVariedad(habits, checks, year, month, todayDay, config.difficulty),
-    () => generateSuperacion(habits, checks, year, month, todayDay, config.difficulty),
-    () => generateRecuperacion(habits, checks, year, month, config.difficulty),
+    () => generateRacha(habits, checks, year, month, todayDay, config.difficulty, L),
+    () => generateConsistencia(habits, checks, year, month, todayDay, config.difficulty, L),
+    () => generateVariedad(habits, checks, year, month, todayDay, config.difficulty, L),
+    () => generateSuperacion(habits, checks, year, month, todayDay, config.difficulty, L),
+    () => generateRecuperacion(habits, checks, year, month, config.difficulty, L),
   ];
 
   const shuffled = shuffle(generators);

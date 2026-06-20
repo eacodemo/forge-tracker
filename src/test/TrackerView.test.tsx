@@ -28,7 +28,13 @@ const baseProps = {
   setNote: vi.fn(),
   update: vi.fn(),
   L: {
-    tracker: { habit: "Hábito", completedDay: "Completadas / día", notesDay: "Notas del día", search: "Filtrar hábitos…" },
+    tracker: {
+      habit: "Hábito", completedDay: "Completadas / día", notesDay: "Notas del día", search: "Filtrar hábitos…",
+      noteTooltip: "Nota", dayLabel: "Día", notePlaceholder: "Nota del día…", reorderHint: "Arrastra para reordenar",
+      checkDone: "Completado: {name}", checkPending: "Marcar completado: {name}",
+      failDone: "Fallaste: {name} — click para desmarcar", failPending: "¿Fallaste hoy? {name}",
+      numHint: "(+1 / clic derecho -1)", failShort: "Fallaste", doneShort: "Completado", failPendingShort: "¿Fallaste hoy?",
+    },
     months: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
     monthsShort: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
     dow: ["D", "L", "M", "X", "J", "V", "S"],

@@ -50,7 +50,7 @@ export default function Onboarding({ onComplete }: { onComplete: (d: Data) => vo
     }
     const data: Data = {
       version: VERSION, onboarded: true,
-      profile: { name: name.trim() || "Usuario", lang: lang as Data["profile"]["lang"], theme: theme as Data["profile"]["theme"], accent: accent as Data["profile"]["accent"], notifHour },
+      profile: { name: name.trim() || Lm.manage.defaultUser, lang: lang as Data["profile"]["lang"], theme: theme as Data["profile"]["theme"], accent: accent as Data["profile"]["accent"], notifHour },
       habits, checks: {}, numeric: {}, notes: {},
     };
     saveData(data);
@@ -178,7 +178,7 @@ export default function Onboarding({ onComplete }: { onComplete: (d: Data) => vo
             {previewHabits.length > 0 && (
               <div style={{ background:"var(--sf2)", borderRadius:"var(--r-md)", padding:"9px 12px", marginBottom:12, maxHeight:150, overflowY:"auto" }}>
                 <div style={{ fontSize:9.5, color:"var(--fg3)", fontFamily:"var(--fm)", textTransform:"uppercase", letterSpacing:1, marginBottom:5 }}>
-                  Preview — {previewHabits.length} hábitos
+                  {L.previewLabel.replace("{n}", String(previewHabits.length))}
                 </div>
                 {previewHabits.map((h: TemplateHabit, i: number) => (
                   <div key={i} style={{ fontSize:12, color:"var(--fg2)", padding:"2px 0" }}>
