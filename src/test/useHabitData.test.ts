@@ -63,7 +63,7 @@ describe("useHabitData", () => {
   it("initializes with default data when localStorage is empty", () => {
     const { result } = renderHook(() => useHabitData());
     expect(result.current.data).toBeDefined();
-    expect(result.current.data.version).toBe("1.3.1");
+    expect(result.current.data.version).toBe("1.3.2");
     expect(result.current.data.onboarded).toBe(false);
   });
 

@@ -40,7 +40,7 @@ describe("newUserData", () => {
   it("creates fresh data with onboarded=false", () => {
     const d = newUserData();
     expect(d.onboarded).toBe(false);
-    expect(d.version).toBe("1.3.1");
+    expect(d.version).toBe("1.3.2");
     expect(d.habits).toEqual([]);
     expect(d.checks).toEqual({});
     expect(d.profile.name).toBe("");
