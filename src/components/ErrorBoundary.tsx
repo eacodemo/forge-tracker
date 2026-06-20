@@ -55,7 +55,7 @@ export default class ErrorBoundary extends Component<Props, State> {
     const acc    = cs?.getPropertyValue("--acc")?.trim()    || "#e63946";
 
     let lang = "es";
-    try { lang = JSON.parse(localStorage.getItem("forge_profile") || "{}").lang || "es"; } catch {}
+    try { lang = JSON.parse(localStorage.getItem("forge_v131") || "{}").profile?.lang || "es"; } catch {}
     const EB = (LANGS[lang] || LANGS.es).errorBoundary;
 
     return (<>

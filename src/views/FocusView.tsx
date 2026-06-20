@@ -63,7 +63,7 @@ export default function FocusView({ year, monthIdx, todayDay, isCurrentMonth, ha
             <div key={hi} className={`focus-card${checked?" done":""}${habit.type==="negative"?" negative":""}`}
               onClick={() => toggleCheck(hi, displayDay)}
               role="button" tabIndex={0}
-              aria-label={`${habit.name}: ${checked?"completado":"pendiente"}`}
+              aria-label={`${habit.name}: ${checked?L.dayView.completed:L.dayView.pending}`}
               onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleCheck(hi, displayDay); } }}>
               <span className="cat-dot" style={{ background:catColor, width:9, height:9 }} />
               <div style={{ flex:1 }}>

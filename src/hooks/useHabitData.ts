@@ -174,7 +174,7 @@ export function useHabitData(): UseHabitDataReturn {
       saveTimerRef.current = setTimeout(() => {
         const saved = saveData(next);
         if (saved) saveDataAsync(next).catch(() => {});
-        else showToast("⚠️ Error guardando datos — almacenamiento lleno", "danger");
+        else showToast(L.settings?.storageError || "⚠️ Error guardando datos", "danger");
       }, 300);
       return next;
     });
@@ -274,7 +274,7 @@ export function useHabitData(): UseHabitDataReturn {
   const gamResult = useGamificationWorker(checks, habits, data.archivedCheckCount || 0);
   const gamStats: GamStats = gamResult?.gamStats || { totalChecks:0, maxStreak:0, perfectDays:0, perfectWeeks:0, maxCombo:0, activeDaysMonth:0, categoriesUsed:0 };
   const xp = gamResult?.xp || 0;
-  const levelData: Level = gamResult?.levelData || { level:1, name:"Iniciado", xpMin:0, xpMax:100 };
+  const levelData: Level = gamResult?.levelData || { level:1, name:L.gamify?.levelNames?.[0]||"Iniciado", xpMin:0, xpMax:100 };
   const badges: Badge[] = gamResult?.badges || [];
   const xpPct = gamResult?.xpPct || 0;
 

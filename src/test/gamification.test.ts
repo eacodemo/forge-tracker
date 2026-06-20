@@ -74,6 +74,33 @@ describe("computeXP", () => {
     const xp = computeXP({ totalChecks: 0, maxStreak: 0, perfectDays: 0, perfectWeeks: 0, maxCombo: 0, activeDaysMonth: 0, categoriesUsed: 4 });
     expect(xp).toBe(XP.VARIETY);
   });
+
+  it("XP per check is exactly 10", () => {
+    expect(computeXP({ totalChecks: 1, ...empty })).toBe(10);
+    expect(computeXP({ totalChecks: 3, ...empty })).toBe(30);
+  });
+
+  it("XP for streak of 7 is 50", () => {
+    expect(computeXP({ ...empty, totalChecks: 0, maxStreak: 7 })).toBe(XP.STREAK_7);
+  });
+
+  it("XP for perfect day is 25", () => {
+    expect(computeXP({ totalChecks: 0, maxStreak: 0, perfectDays: 1, perfectWeeks: 0, maxCombo: 0, activeDaysMonth: 0, categoriesUsed: 0 })).toBe(XP.PERFECT_DAY);
+  });
+
+  it("total XP combines checks + streaks + perfects + variety", () => {
+    const stats = {
+      totalChecks: 10,
+      maxStreak: 14,
+      perfectDays: 2,
+      perfectWeeks: 1,
+      maxCombo: 0,
+      activeDaysMonth: 0,
+      categoriesUsed: 4,
+    };
+    const expected = (10 * XP.CHECK) + XP.STREAK_7 + XP.STREAK_14 + (2 * XP.PERFECT_DAY) + XP.PERFECT_WEEK + XP.VARIETY;
+    expect(computeXP(stats)).toBe(expected);
+  });
 });
 
 describe("getLevel", () => {
@@ -90,6 +117,28 @@ describe("getLevel", () => {
     expect(getLevel(200).level).toBe(2);
     expect(getLevel(499).level).toBe(2);
     expect(getLevel(500).level).toBe(3);
+  });
+
+  it("returns correct level for each range", () => {
+    expect(getLevel(0).level).toBe(1);
+    expect(getLevel(200).level).toBe(2);
+    expect(getLevel(500).level).toBe(3);
+    expect(getLevel(1000).level).toBe(4);
+    expect(getLevel(2000).level).toBe(5);
+    expect(getLevel(4000).level).toBe(6);
+    expect(getLevel(8000).level).toBe(7);
+  });
+
+  it("returns correct xpMax for next level", () => {
+    const result = getLevel(300);
+    expect(result.level).toBe(2);
+    expect(result.xpMax).toBe(500);
+  });
+
+  it("returns Infinity xpMax at max level", () => {
+    const result = getLevel(99999);
+    expect(result.level).toBe(7);
+    expect(result.xpMax).toBe(Infinity);
   });
 });
 
@@ -130,5 +179,47 @@ describe("getEarnedBadges", () => {
   it("earns variety badge with 4 categories", () => {
     const badges = getEarnedBadges({ ...empty, categoriesUsed: 4 });
     expect(badges.find(b => b.id === "variety")?.earned).toBe(true);
+  });
+
+  it("does not earn first_check with 0 checks", () => {
+    const badges = getEarnedBadges(empty);
+    expect(badges.find(b => b.id === "first_check")?.earned).toBe(false);
+  });
+
+  it("does not earn streak_7 with streak of 5", () => {
+    const badges = getEarnedBadges({ ...empty, maxStreak: 5 });
+    expect(badges.find(b => b.id === "streak_7")?.earned).toBe(false);
+  });
+
+  it("does not earn legend badge below level 6", () => {
+    const badges = getEarnedBadges({ ...empty, totalChecks: 100 });
+    expect(badges.find(b => b.id === "legend")?.earned).toBe(false);
+  });
+
+  it("earns consistent badge with 15+ active days", () => {
+    const badges = getEarnedBadges({ ...empty, activeDaysMonth: 15 });
+    expect(badges.find(b => b.id === "consistent")?.earned).toBe(true);
+  });
+});
+
+describe("XP constants", () => {
+  it("has correct XP values", () => {
+    expect(XP.CHECK).toBe(10);
+    expect(XP.STREAK_7).toBe(50);
+    expect(XP.STREAK_14).toBe(100);
+    expect(XP.STREAK_30).toBe(200);
+    expect(XP.STREAK_60).toBe(500);
+    expect(XP.STREAK_100).toBe(1000);
+    expect(XP.PERFECT_DAY).toBe(25);
+    expect(XP.PERFECT_WEEK).toBe(100);
+    expect(XP.PERFECT_MONTH).toBe(500);
+    expect(XP.VARIETY).toBe(150);
+  });
+
+  it("has 7 levels with increasing XP requirements", () => {
+    expect(LEVELS).toHaveLength(7);
+    for (let i = 1; i < LEVELS.length; i++) {
+      expect(LEVELS[i].xpMin).toBeGreaterThanOrEqual(LEVELS[i - 1].xpMax);
+    }
   });
 });

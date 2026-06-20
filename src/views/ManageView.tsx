@@ -58,7 +58,7 @@ function HabitForm({ initial, onSave, onCancel, L, lang }:
               onChange={e=>{ const v=e.target.value; if(v===""||v==="-"){setGoal(NaN);return;} const n=Number(v); if(!isNaN(n)&&n>=0)setGoal(n); }}
               onBlur={()=>{ if(isNaN(goal)||goal<1) setGoal(1); }}
               style={{ maxWidth:76 }}/>
-            <input className="manage-input" value={unit} onChange={e=>setUnit(e.target.value)} placeholder="Unidad"/>
+            <input className="manage-input" value={unit} onChange={e=>setUnit(e.target.value)} placeholder={L.manage.unitPlaceholder}/>
           </div>
         )}
         <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
@@ -162,7 +162,7 @@ export default function ManageView({ habits, data, update, showToast, L, lang, p
   function saveSettings() {
     const newProfile: Profile = {
       ...profile,
-      name:      sName.trim() || "Usuario",
+      name:      sName.trim() || L.manage.defaultUser,
       lang:      sLang as Profile["lang"],
       theme:     sTheme as Profile["theme"],
       accent:    sAccent as Profile["accent"],
@@ -194,7 +194,7 @@ export default function ManageView({ habits, data, update, showToast, L, lang, p
             <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
               <div className="settings-group">
                 <div className="settings-label">{L.settings?.username||"Nombre"}</div>
-                <input className="manage-input" value={sName} onChange={e=>setSName(e.target.value)} placeholder="Tu nombre"/>
+                <input className="manage-input" value={sName} onChange={e=>setSName(e.target.value)} placeholder={L.settings?.usernamePlaceholder||"Tu nombre"}/>
               </div>
               <div className="settings-group">
                 <div className="settings-label">{L.settings?.lang||"Idioma"}</div>
@@ -210,7 +210,7 @@ export default function ManageView({ habits, data, update, showToast, L, lang, p
                 <div className="settings-row">
                   {["dark","light"].map(t=>(
                     <button key={t} onClick={()=>setSTheme(t)}
-                      className={`settings-option${sSTheme===t?" active":""}`}>{t==="dark"?"🌙 Oscuro":"☀️ Claro"}</button>
+                      className={`settings-option${sSTheme===t?" active":""}`}>{t==="dark"?`🌙 ${L.manage.themeDark}`:`☀️ ${L.manage.themeLight}`}</button>
                   ))}
                 </div>
               </div>

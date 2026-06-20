@@ -1,7 +1,7 @@
 import { validateAndRepair, safeJsonParse } from "./validate.js";
-import { dbSave, dbLoad } from "./db.js";
+import { dbSave, dbLoad, saveProfile, loadProfile, migrateLocalStorageToIDB } from "./db.js";
 import { VERSION } from "./constants";
-import type { Data, Habit, HabitSchedule, AccentPalette, Category, CategoryId, HabitType } from "../types";
+import type { Data, Habit, HabitSchedule, AccentPalette, Category, CategoryId, HabitType, Profile } from "../types";
 
 const KEY     = "forge_v131";
 
@@ -190,6 +190,7 @@ export function loadData(): Data {
 export function saveData(data: Data): boolean {
   try {
     localStorage.setItem(KEY, JSON.stringify(data));
+    if (data.profile) saveProfile(data.profile);
     return true;
   } catch(e) {
     console.error("saveData failed:", e);
@@ -272,9 +273,16 @@ export async function loadDataAsync(): Promise<Data> {
     fromDB.numeric = migrateChecks(fromDB.numeric as Record<string, unknown> | undefined) as any;
     const repaired = validateAndRepair(fromDB);
     localStorage.setItem(KEY, JSON.stringify(repaired));
+    if (repaired.profile) saveProfile(repaired.profile);
     return repaired;
   }
-  return loadData();
+  
+  const localData = loadData();
+  if (localData.habits && localData.habits.length > 0) {
+    await migrateLocalStorageToIDB();
+  }
+  
+  return localData;
 }
 
 export function archiveOldChecks(data: Data, keepMonths: number = 6): Data {

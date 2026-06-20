@@ -1,12 +1,26 @@
 import type { GamStats, Level, Badge } from "../types";
 import { computeMaxStreakCrossMonth } from "./streaks";
 import { getChallengeXP, loadChallengeStore } from "./challenges";
+import type { TranslationSet } from "../i18n/translations";
 
 export const XP = {
   CHECK:10, STREAK_7:50, STREAK_14:100, STREAK_30:200, STREAK_60:500, STREAK_100:1000,
   PERFECT_DAY:25, PERFECT_WEEK:100, PERFECT_MONTH:500,
   VARIETY:150,
 };
+
+export function buildLevels(L: TranslationSet): Level[] {
+  const names = L.gamify?.levelNames || ["Iniciado","Constante","Disciplinado","Imparable","Élite","Leyenda","Maestro"];
+  return [
+    { level:1, name:names[0]||"Iniciado",     xpMin:0,    xpMax:200  },
+    { level:2, name:names[1]||"Constante",     xpMin:200,  xpMax:500  },
+    { level:3, name:names[2]||"Disciplinado",  xpMin:500,  xpMax:1000 },
+    { level:4, name:names[3]||"Imparable",     xpMin:1000, xpMax:2000 },
+    { level:5, name:names[4]||"Élite",         xpMin:2000, xpMax:4000 },
+    { level:6, name:names[5]||"Leyenda",       xpMin:4000, xpMax:8000 },
+    { level:7, name:names[6]||"Maestro",       xpMin:8000, xpMax:Infinity },
+  ];
+}
 
 export const LEVELS: Level[] = [
   { level:1, name:"Iniciado",     xpMin:0,    xpMax:200  },
@@ -18,25 +32,39 @@ export const LEVELS: Level[] = [
   { level:7, name:"Maestro",      xpMin:8000, xpMax:Infinity },
 ];
 
-const BADGE_DEFS = [
-  { id:"first_check",  icon:"✅", name:"Primer paso",       desc:"Completa tu primer hábito",             check:(s:GamStats&{level:number})=>s.totalChecks>=1 },
-  { id:"streak_3",     icon:"🔥", name:"Racha de 3",        desc:"3 días seguidos en un hábito",          check:(s:GamStats&{level:number})=>s.maxStreak>=3 },
-  { id:"streak_7",     icon:"⚡", name:"Racha de 7",        desc:"7 días seguidos en un hábito",          check:(s:GamStats&{level:number})=>s.maxStreak>=7 },
-  { id:"streak_14",    icon:"💫", name:"Racha de 14",       desc:"14 días seguidos en un hábito",         check:(s:GamStats&{level:number})=>s.maxStreak>=14 },
-  { id:"streak_30",    icon:"💎", name:"Racha de 30",       desc:"30 días seguidos en un hábito",         check:(s:GamStats&{level:number})=>s.maxStreak>=30 },
-  { id:"streak_60",    icon:"🔷", name:"Racha de 60",       desc:"60 días seguidos en un hábito",         check:(s:GamStats&{level:number})=>s.maxStreak>=60 },
-  { id:"streak_100",   icon:"💠", name:"Racha de 100",      desc:"100 días seguidos en un hábito",        check:(s:GamStats&{level:number})=>s.maxStreak>=100 },
-  { id:"perfect_day",  icon:"🌟", name:"Día perfecto",      desc:"Completa todos los hábitos en un día",  check:(s:GamStats&{level:number})=>s.perfectDays>=1 },
-  { id:"perfect_week", icon:"🏆", name:"Semana perfecta",   desc:"7 días perfectos consecutivos",         check:(s:GamStats&{level:number})=>s.perfectWeeks>=1 },
-  { id:"perfect_month",icon:"🌕", name:"Mes perfecto",      desc:"Completa todos los días del mes",       check:(s:GamStats&{level:number})=>s.maxCombo>=28 },
-  { id:"variety",      icon:"🎨", name:"Variedad",          desc:"Hábitos en 4+ categorías distintas",    check:(s:GamStats&{level:number})=>s.categoriesUsed>=4 },
-  { id:"century",      icon:"💯", name:"100 checks",        desc:"Completa 100 hábitos en total",         check:(s:GamStats&{level:number})=>s.totalChecks>=100 },
-  { id:"consistent",   icon:"📅", name:"Consistente",       desc:"Activo 15+ días en un mes",             check:(s:GamStats&{level:number})=>s.activeDaysMonth>=15 },
-  { id:"grind",        icon:"⚔️", name:"El Grind",          desc:"Completa 500 hábitos en total",         check:(s:GamStats&{level:number})=>s.totalChecks>=500 },
-  { id:"dedicated",    icon:"⚜️", name:"Dedicación",        desc:"Completa 2500 hábitos en total",        check:(s:GamStats&{level:number})=>s.totalChecks>=2500 },
-  { id:"legend",       icon:"👑", name:"Leyenda",           desc:"Llega al nivel 6",                     check:(s:GamStats&{level:number})=>s.level>=6 },
-  { id:"master",       icon:"🗿", name:"Maestro",           desc:"Llega al nivel 7",                     check:(s:GamStats&{level:number})=>s.level>=7 },
-];
+const BADGE_ICONS: Record<string, string> = {
+  first_check:"✅", streak_3:"🔥", streak_7:"⚡", streak_14:"💫", streak_30:"💎", streak_60:"🔷", streak_100:"💠",
+  perfect_day:"🌟", perfect_week:"🏆", perfect_month:"🌕", variety:"🎨", century:"💯", consistent:"📅",
+  grind:"⚔️", dedicated:"⚜️", legend:"👑", master:"🗿",
+};
+
+const BADGE_CHECKS: Record<string, (s:GamStats&{level:number})=>boolean> = {
+  first_check:  s=>s.totalChecks>=1,
+  streak_3:     s=>s.maxStreak>=3,
+  streak_7:     s=>s.maxStreak>=7,
+  streak_14:    s=>s.maxStreak>=14,
+  streak_30:    s=>s.maxStreak>=30,
+  streak_60:    s=>s.maxStreak>=60,
+  streak_100:   s=>s.maxStreak>=100,
+  perfect_day:  s=>s.perfectDays>=1,
+  perfect_week: s=>s.perfectWeeks>=1,
+  perfect_month:s=>s.maxCombo>=28,
+  variety:      s=>s.categoriesUsed>=4,
+  century:      s=>s.totalChecks>=100,
+  consistent:   s=>s.activeDaysMonth>=15,
+  grind:        s=>s.totalChecks>=500,
+  dedicated:    s=>s.totalChecks>=2500,
+  legend:       s=>s.level>=6,
+  master:       s=>s.level>=7,
+};
+
+export function buildBadgeDefs(L: TranslationSet) {
+  const defs = L.gamify?.badgeDefs || {};
+  return Object.keys(BADGE_CHECKS).map(id => {
+    const d = (defs as any)[id] || {};
+    return { id, icon: BADGE_ICONS[id]||"🏆", name: d.name||id, desc: d.desc||"", check: BADGE_CHECKS[id] };
+  });
+}
 
 const KEY_RE = /^(\d{4})-(\d{2})-(\d+)-(\d+)$/;
 
@@ -92,9 +120,22 @@ export function getLevel(xp: number): Level {
   return LEVELS.find(l=>xp>=l.xpMin&&xp<l.xpMax)||LEVELS[LEVELS.length-1];
 }
 
-export function getEarnedBadges(stats: GamStats): Badge[] {
-  const level = getLevel(computeXP(stats)).level;
-  return BADGE_DEFS.map(b=>({ ...b, earned: b.check({...stats, level}) }));
+export function getLevelTranslated(xp: number, L: TranslationSet): Level {
+  const levels = buildLevels(L);
+  return levels.find(l=>xp>=l.xpMin&&xp<l.xpMax)||levels[levels.length-1];
 }
 
-export { BADGE_DEFS as BADGES };
+const DEFAULT_BADGE_DEFS = buildBadgeDefs({ gamify: { badgeDefs: {} } } as any);
+
+export function getEarnedBadges(stats: GamStats): Badge[] {
+  const level = getLevel(computeXP(stats)).level;
+  return DEFAULT_BADGE_DEFS.map(b=>({ ...b, earned: b.check({...stats, level}) }));
+}
+
+export function getEarnedBadgesTranslated(stats: GamStats, L: TranslationSet): Badge[] {
+  const level = getLevelTranslated(computeXP(stats), L).level;
+  const defs = buildBadgeDefs(L);
+  return defs.map(b=>({ ...b, earned: b.check({...stats, level}) }));
+}
+
+export { DEFAULT_BADGE_DEFS as BADGES };

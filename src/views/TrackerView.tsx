@@ -10,9 +10,10 @@ interface CheckButtonProps {
   onToggle: () => void;
   numVal?: number;
   onNumeric: (val: number) => void;
+  L: TranslationSet;
 }
 
-function CheckButton({ habit, checked, onToggle, numVal, onNumeric }: CheckButtonProps) {
+function CheckButton({ habit, checked, onToggle, numVal, onNumeric, L }: CheckButtonProps) {
   if (habit.type === "numeric") {
     const goal = habit.goal || 1;
     const val  = numVal || 0;
@@ -29,7 +30,7 @@ function CheckButton({ habit, checked, onToggle, numVal, onNumeric }: CheckButto
         onClick={() => onNumeric(Math.min((val||0)+1, goal))}
         onContextMenu={e => { e.preventDefault(); onNumeric(Math.max((val||0)-1,0)); }}
         aria-label={`${habit.name}: ${val}/${goal}${habit.unit?" "+habit.unit:""}`}
-        title={`${val}/${goal}${habit.unit?" "+habit.unit:""}  (+1 / clic derecho -1)`}>
+        title={`${val}/${goal}${habit.unit?" "+habit.unit:""}  ${L.tracker.numHint}`}>
         {val > 0 ? val : ""}
       </button>
     );
@@ -38,8 +39,8 @@ function CheckButton({ habit, checked, onToggle, numVal, onNumeric }: CheckButto
   return (
     <button className={`check-cell${checked?" checked":""}${isNeg?" neg":""}`}
       onClick={onToggle}
-      aria-label={isNeg ? (checked?`Fallaste: ${habit.name} — click para desmarcar`:`¿Fallaste hoy? ${habit.name}`) : (checked?`Completado: ${habit.name}`:`Marcar completado: ${habit.name}`)}
-      title={isNeg ? (checked?"Fallaste — click para desmarcar":"¿Fallaste hoy?") : (checked?"Completado":"Marcar completado")}>
+      aria-label={isNeg ? (checked?L.tracker.failDone.replace("{name}",habit.name):L.tracker.failPending.replace("{name}",habit.name)) : (checked?L.tracker.checkDone.replace("{name}",habit.name):L.tracker.checkPending.replace("{name}",habit.name))}
+      title={isNeg ? (checked?L.tracker.failShort:"¿Fallaste hoy?") : (checked?L.tracker.doneShort:L.tracker.checkPending)}>
       {checked ? (isNeg ? "✗" : "✓") : ""}
     </button>
   );
@@ -150,7 +151,7 @@ export default function TrackerView({
       <table className="tracker-table">
         <thead>
           <tr>
-            <th className="habit-name-th" title="Arrastra para reordenar">{L.tracker.habit} ↕</th>
+            <th className="habit-name-th" title={L.tracker.reorderHint}>{L.tracker.habit} ↕</th>
             {days.map(d => (
               <th key={d} className={`day-th${isCurrentMonth&&d===todayDay?" t-col":""}${isWeekSep(d)?" wsep":""}`}>{d}</th>
             ))}
@@ -178,7 +179,7 @@ export default function TrackerView({
                 onDrop={e      => onDrop(e, hi)}
                 onDragEnd={onDragEnd}
               >
-                <td className="habit-name-cell" title={`${habit.name} — arrastra para reordenar`}>
+                <td className="habit-name-cell" title={`${habit.name} — ${L.tracker.reorderHint}`}>
                   <span style={{ color:"var(--fg4)", fontSize:9, marginRight:5, fontFamily:"var(--fm)" }}>
                     {String(hi+1).padStart(2,"0")}
                   </span>
@@ -203,7 +204,7 @@ export default function TrackerView({
                     <td key={d} className={`check-td${isToday?" t-col":""}${isWeekSep(d)?" wsep":""}`}>
                       <CheckButton habit={habit} checked={checked}
                         onToggle={() => toggleCheck(hi, d)}
-                        numVal={numVal} onNumeric={v => setNumeric(hi, d, v)} />
+                        numVal={numVal} onNumeric={v => setNumeric(hi, d, v)} L={L} />
                     </td>
                   );
                 })}
@@ -254,7 +255,7 @@ export default function TrackerView({
               const isOpen  = openNoteDay === d;
               return (
                 <td key={d} style={{ padding:"3px 1px", textAlign:"center", position:"relative", borderLeft:isWeekSep(d)?"1px solid var(--week-sep)":undefined }}>
-                  <button onClick={() => setOpenNoteDay(isOpen?null:d)} title={hasNote?notes[noteKey]:"Nota"} style={{
+                  <button onClick={() => setOpenNoteDay(isOpen?null:d)} title={hasNote?notes[noteKey]:L.tracker.dayLabel} style={{
                     width:24, height:24, borderRadius:"var(--r-sm)",
                     border: hasNote?"1.5px solid var(--acc)":"1px solid var(--bdr2)",
                     background: hasNote?"var(--acc-dim)":"transparent",
@@ -264,10 +265,10 @@ export default function TrackerView({
                   </button>
                   {isOpen && (
                     <div style={{ position:"absolute", top:"110%", left:"50%", transform:"translateX(-50%)", zIndex:60, background:"var(--sf2)", border:"1px solid var(--bdr2)", borderRadius:"var(--r-md)", padding:10, width:178, boxShadow:"0 8px 32px rgba(0,0,0,.45)" }}>
-                      <div style={{ fontSize:10, color:"var(--fg3)", marginBottom:5, fontFamily:"var(--fm)" }}>Día {d}</div>
+                      <div style={{ fontSize:10, color:"var(--fg3)", marginBottom:5, fontFamily:"var(--fm)" }}>{L.tracker.dayLabel} {d}</div>
                       <textarea autoFocus className="note-input" rows={3}
                         defaultValue={notes[noteKey]||""}
-                        placeholder="Nota del día…"
+                        placeholder={L.tracker.notePlaceholder}
                         onBlur={e => { setNote(d, e.target.value); setOpenNoteDay(null); }}
                         onKeyDown={e => { if(e.key==="Escape") setOpenNoteDay(null); }}
                       />

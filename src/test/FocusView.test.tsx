@@ -23,6 +23,7 @@ const baseProps = {
   toggleCheck: () => {},
   L: {
     focus: { mode: "Focus", perfectDay: "¡Día perfecto!", consecutive: "días" },
+    dayView: { completed: "completado", pending: "pendiente" },
     months: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
     dow: ["D", "L", "M", "X", "J", "V", "S"],
     dowFull: ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
